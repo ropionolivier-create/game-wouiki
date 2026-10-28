@@ -1,0 +1,16 @@
+GAME WOUiki — site et jeux intégrés
+
+Pour tester :
+1. Décompressez l'archive.
+2. Ouvrez index.html dans un navigateur.
+3. Cliquez sur « Jouer au jeu » pour lancer l'un des trois jeux.
+
+Fichiers :
+- index.html : page d'accueil Game Wouiki
+- jeux/gare-au-loup.html : Gare au loup
+- jeux/babel.html : Babel
+- jeux/bac-a-sable-royale.html : Bac à sable royal (battle royale de jouets : voitures miniatures et figurines qui s'affrontent)
+
+Mise en ligne :
+Téléversez le contenu du dossier Game_Wouiki sur un hébergeur de site statique en conservant cette structure de dossiers.
+Les fichiers de jeu sont conservés tels que fournis. Certains jeux peuvent dépendre de fonctions du navigateur ou de connexions externes.
