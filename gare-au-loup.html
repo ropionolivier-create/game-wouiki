@@ -7,7 +7,7 @@
       le reste de cette page n'est pas exécuté et elle est remplacée par la version reçue.
    2) Sinon, on garde une copie intacte de la page, pour pouvoir l'envoyer à des amis
       qui auraient une version plus ancienne. */
-var GAL_BOOT = { v:'0.28.1', src:null, running:null, failed:null };
+var GAL_BOOT = { v:'0.32', src:null, running:null, failed:null };
 (function(){
   function newer(a,b){ a = String(a).split('.').map(Number); b = String(b).split('.').map(Number);
     for(var i = 0; i < Math.max(a.length, b.length); i++){ var x = a[i] || 0, y = b[i] || 0; if(x !== y) return x > y; } return false; }
@@ -487,6 +487,16 @@ html.rot.ln #chat{left:8px;right:8px;width:auto;bottom:8px;max-height:56%;}
 
 #pause{z-index:60;max-height:calc(var(--VH) - 24px);overflow:auto;}
 #mMenu{padding:2px 12px;font-size:18px;}
+
+#diagBox{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(255,246,227,.82);pointer-events:none;font-family:inherit;color:#2b1d14;text-align:center;padding:16px;}
+#diagBox.small{inset:auto 0 0 0;height:150px;background:rgba(255,246,227,.92);border-top:3px solid #2b1d14;}
+#diagBox .dg-top{display:flex;flex-direction:column;gap:6px;max-width:520px;} #diagBox .dg-top b{font-size:20px;} #diagBox .dg-top span{font-size:14px;}
+#dgCount{font-size:64px;font-weight:bold;line-height:1;} #diagBox.small #dgCount{font-size:34px;}
+#dgSq{width:40px;height:40px;background:#c8432b;border:3px solid #2b1d14;} #diagBox.small #dgSq{width:22px;height:22px;}
+#diagCv{position:fixed;inset:0;width:100vw;height:100vh;z-index:8999;display:none;}
+#diagRep{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9100;width:min(94vw,560px);max-height:90vh;overflow:auto;}
+#diagRep pre{white-space:pre-wrap;font-size:12.5px;background:#fff;border:2px solid #2b1d14;border-radius:8px;padding:8px;}
+#diagRep .row2{display:flex;gap:10px;justify-content:flex-end;}
 </style>
 
 <canvas id="cv" aria-label="Le village vu du dessus"></canvas>
@@ -536,6 +546,7 @@ html.rot.ln #chat{left:8px;right:8px;width:auto;bottom:8px;max-height:56%;}
       <div class="row"><span class="lab">Difficulté des IA</span><div class="seg"><button data-diff="facile">Facile</button><button data-diff="normal">Normal</button><button data-diff="difficile">Difficile</button></div></div>
       <div class="row"><span class="lab">Affichage</span><div class="seg"><button data-orient="auto">Auto</button><button data-orient="portrait">Portrait</button><button data-orient="paysage">Paysage</button></div></div>
       <div class="row"><span class="lab">Graphismes</span><div class="seg"><button data-gfx="auto">Auto</button><button data-gfx="fluide">Fluide</button><button data-gfx="nette">Détaillés</button><button data-gfx="compat">Compatibilité</button></div></div>
+      <div class="row"><span class="lab">Problème d'affichage ?</span><div class="seg"><button id="optDiag" type="button">Diagnostic d'affichage</button></div></div>
       <div class="toggles"><label><input type="checkbox" id="optReveal"> Révéler le rôle des éliminés</label><label title="Les éliminés deviennent des esprits invisibles qui aident un protégé"><input type="checkbox" id="optSpirits"> Esprits après la mort</label><label><input type="checkbox" id="optSound"> Son</label></div>
       <div class="cta">
         <button class="btn" id="playSolo">Jouer contre l'IA !</button>
@@ -698,7 +709,7 @@ html.rot.ln #chat{left:8px;right:8px;width:auto;bottom:8px;max-height:56%;}
    recherche de chemin (A*) et sons synthétiques.
    ========================================================= */
 
-const GAME_VERSION = '0.28.1';
+const GAME_VERSION = '0.32';
 const TS = 32, MW = 48, MH = 36;
 const T = { GRASS:0, PATH:1, STONE:2, LEAVES:3, WALL:4, TREE:5, WATER:6, HEDGE:7, CROP:8, TRAIL:9, CELL:10 };
 // CELL : la cellule de la prison — on n'y entre pas, mais on voit à travers les barreaux
@@ -1752,7 +1763,7 @@ function goNearRect(c,r,front){
 
 Object.assign(ROLE_INFO, {
   petite:  { name:'Petite fille', team:'village', desc:"La nuit, depuis votre maison, épiez par la fenêtre : vous voyez beaucoup plus loin et reconnaissez les loups de près. Mais si un loup passe près de chez vous pendant que vous épiez, il vous repère…" },
-  maudit:  { name:'Villageois maudit', team:'village', desc:"Vous jouez pour le village… tant qu'aucun loup ne vous attaque. Si un loup-garou vous attaque, vous ne mourez pas : vous devenez loup-garou à votre tour. Votre sang maudit repousse aussi la première morsure d'un vampire (sans que vous voyiez qui), mais le vampire comprend qui vous êtes." },
+  maudit:  { name:'Villageois maudit', team:'village', desc:"Vous jouez pour le village… tant qu'aucun loup ne vous attaque. Si un loup-garou vous attaque la nuit, ou si un vampire vous mord, vous ne mourez pas : la malédiction échange vos rôles. Vous devenez loup-garou (ou vampire), et votre agresseur devient le villageois maudit." },
   ancien:  { name:'Ancien', team:'village', desc:"Vous avez la peau dure : vous survivez à la première attaque d'un loup-garou, et votre vieux sang résiste à la première morsure d'un vampire (sans voir qui)." },
   corbeau: { name:'Corbeau', team:'village', desc:"(rôle retiré)" },
   sherif:  { name:'Shérif', team:'village', desc:"Le jour, arrêtez un habitant (un par jour) : il reste en prison jusqu'au lendemain matin, sauf si quelqu'un vient le libérer. En prison, il ne peut rien faire… et un loup peut l'atteindre la nuit à travers les barreaux." },
@@ -1810,6 +1821,12 @@ function attackHook(v,k,h,how){
     tell(k, `${v.name} a résisté à votre attaque !`,'warn');
     return true;
   }
+  // la nuit, la malédiction échange les rôles : le maudit devient loup, le loup devient le villageois maudit
+  if(v.role === 'maudit' && !day){
+    G.nightKill = true; G.nightEvents.blocked.push(h.i); G.trail = []; G.trailRec = k;
+    curseSwap(v, k);
+    return true;
+  }
   if(v.role === 'maudit'){
     v.role = 'loup'; v.origRole = 'maudit'; v.converted = G.day;
     if(!day){ G.nightKill = true; G.nightEvents.blocked.push(h.i); G.trail = []; G.trailRec = k; }
@@ -1830,6 +1847,30 @@ function attackHook(v,k,h,how){
     return true;
   }
   return false;
+}
+
+/* ---------- Malédiction : échange des rôles entre le maudit et son agresseur ----------
+   Attaqué la nuit par un loup, ou mordu par un vampire, le villageois maudit prend le rôle
+   de son agresseur (loup-garou, vampire ou Maître vampire), et l'agresseur devient le
+   villageois maudit, qui joue pour le village. La malédiction peut ensuite repasser. */
+function curseSwap(v,k){
+  const r = k.role, wolf = r === 'loup', T = wolf ? 'loup-garou' : r === 'mvampire' ? 'Maître vampire' : 'vampire';
+  for(const key of SWAP_KEYS) [v[key], k[key]] = [k[key], v[key]];
+  v.role = r; k.role = 'maudit';
+  v.origRole = v.origRole || 'maudit'; v.converted = G.day; k.cursed = G.day;
+  v.curseBit = k.curseBit = null; v.peekOn = k.peekOn = false; v.ambushArmed = k.ambushArmed = false; v.claimed = k.claimed = false;
+  k.sun = 0; k.sunWarn1 = k.sunWarn2 = false; k.working = false;
+  if(!wolf){ v.sun = 0; v.bitten = G.day; v.vampBy = k.id; G.vampBit = G.day; G.vampHaste = false; }
+  v.sabCd = Math.max(v.sabCd || 0, 10);
+  const mate = o => wolf ? o.role === 'loup' : isVamp(o);
+  if(v.ai){ v.notes = v.notes.filter(n => n.about == null || !mate(charById(n.about))); for(const id in v.susp) if(mate(charById(id))) v.susp[id] = -40; }
+  for(const o of G.chars) if(o.ai && o !== v && mate(o)) o.susp[v.id] = -40;
+  for(const o of G.chars) if(o.ai && o !== k && mate(o) && (o.susp[k.id] || 0) < 0) o.susp[k.id] = 0;   // l'ancien complice n'est plus protégé
+  G.journal.push({ day:G.day, kind:'nuit', text:`Nuit ${G.day} : ${k.name} (${T}) a ${wolf ? 'attaqué' : 'mordu'} ${v.name}, le villageois maudit : la malédiction a échangé leurs rôles. ${v.name} devient ${T}, ${k.name} devient villageois maudit.` });
+  if(isPlayer(v)) asPlayer(v, () => { toast(wolf ? 'Des griffes… puis une brûlure : la malédiction a frappé. Vous êtes devenu LOUP-GAROU, et votre agresseur a pris votre place de villageois maudit !' : `Deux crocs… puis une brûlure : la malédiction a frappé. Vous êtes devenu ${T.toUpperCase()}, et votre agresseur a pris votre place de villageois maudit !`, 'bad'); sfx(wolf ? 'howl' : 'heart', 0.9); UI.lastHud = ''; UI.lastTasks = ''; });
+  if(isPlayer(k)) asPlayer(k, () => { toast(`${v.name} était le villageois maudit ! La malédiction vous a pris : vous êtes maintenant VILLAGEOIS MAUDIT et vous jouez pour le village. ${v.name} a pris votre place.`, 'warn'); UI.lastHud = ''; UI.lastTasks = ''; });
+  forHumans(() => { const P = G.player; if(P !== v && P !== k && P.alive && mate(P)) toast(`La malédiction a frappé : ${k.name} n'est plus des vôtres, ${v.name} a pris sa place${r === 'mvampire' ? ' comme Maître vampire' : ''}.`, 'warn'); });
+  checkWin();
 }
 
 /* ---------- Pouvoirs de nuit : IA ---------- */
@@ -1919,7 +1960,7 @@ const ROLE_SHEET = {
   sherif:    { icon:'S', when:'Le jour', abil:["Arrêter un habitant à portée de main (bouton secondaire) : il est mis en prison jusqu'au lendemain matin. Une arrestation par jour.","En prison : impossible de bouger, de travailler, de saboter ou de chasser ; on assiste quand même aux réunions et on vote.","N'importe qui peut venir libérer un prisonnier devant la prison (un loup peut libérer son complice !).","La nuit, un prisonnier ne peut pas rentrer chez lui : un loup peut l'attaquer à travers les barreaux (un vampire peut le mordre de la même façon).","Un vampire en prison ne peut pas sortir mordre la nuit.","Arrêter quelqu'un sous les yeux des autres révèle que vous êtes le shérif."] },
   chaman:    { icon:'Ch', when:'Nuit, depuis sa maison', abil:["Échanger les rôles de deux habitants, vous compris si vous le souhaitez. Un échange par nuit, avant le milieu de la nuit.","L'échange prend effet à l'aube : les deux concernés découvrent leur nouveau rôle au réveil, et le village apprend seulement que le chaman a agi.","Attention : échanger un loup-garou avec un villageois fait passer l'autre dans la meute !","Échanger un vampire avec un habitant libère le vampire de la malédiction… mais l'autre devient vampire à sa place."] },
   petite:    { icon:'P', when:'Nuit, depuis sa maison', abil:["« Épier » par la fenêtre : vue portée à 7,5 cases.","Reconnaît un loup ou un vampire à moins de 4,5 cases (au-delà : une silhouette au loin).","Risque : un loup qui passe à moins de 3,5 cases la repère et la visera en priorité."] },
-  maudit:    { icon:'M', when:'Passif', abil:["Joue pour le village tant qu'il n'est pas attaqué.","S'il est attaqué par un loup : il survit et devient loup-garou (rejoint la meute).","Mordu par un vampire : son sang maudit repousse la première morsure, mais il dort et ne voit pas qui l'a mordu. Le vampire, lui, sait désormais qu'il est le maudit, et la morsure suivante prend.","Poignardé en plein jour : la malédiction se retourne, le loup qui a frappé meurt et devient un esprit.","Éliminé par le vote ou le chasseur : il meurt normalement. Apparaît à partir de 7 habitants."] },
+  maudit:    { icon:'M', when:'Passif', abil:["Joue pour le village tant qu'il n'est pas attaqué.","Attaqué la nuit par un loup : il ne meurt pas, la malédiction échange les rôles. Il devient loup-garou et rejoint la meute ; le loup qui l'a attaqué devient le villageois maudit et joue pour le village.","Mordu par un vampire : même échange. Il devient vampire (ou Maître vampire si c'est le Maître qui a mordu) ; le vampire devient le villageois maudit.","Le nouveau maudit porte la malédiction à son tour : s'il est attaqué ou mordu la nuit, les rôles s'échangent encore. L'attaque ou la morsure de la nuit est utilisée.","Poignardé en plein jour : la malédiction se retourne, le loup qui a frappé meurt et devient un esprit.","Éliminé par le vote ou le chasseur : il meurt normalement. Apparaît à partir de 7 habitants."] },
   ancien:    { icon:'A', when:'Passif', abil:["Survit à la première attaque d'un loup (la porte garde des griffures).","Résiste à la première morsure d'un vampire, sans voir qui l'a mordu (la nuit des vampires est perdue).","La deuxième attaque est fatale.","Jamais dans la même partie que le gardien."] },
   corbeau:   { icon:'Co', when:'Nuit, depuis sa maison', abil:["Désigner un habitant : il commence la réunion suivante avec 2 voix contre lui.","Une plume noire l'annonce publiquement, sans dire qui l'a posée."] },
   renard:    { icon:'R', when:'Nuit, depuis sa maison', abil:["Flairer une maison : savoir si un loup (ou un vampire) se cache chez cet habitant ou chez ses deux plus proches voisins.","2 flairs par partie, 1 par nuit."] }
@@ -1939,7 +1980,7 @@ function roleStatusHTML(P){
     case 'gardien': L.push('Cette nuit : ' + (night ? (G.powerUsed ? `protège la maison ${esc(de(ownerOf(MAP.houses[G.guarded]).name))}` : yes('à choisir')) : 'la prochaine nuit')); if(P.guardLast >= 0) L.push(`Interdite ce soir : maison ${esc(de(ownerOf(MAP.houses[P.guardLast]).name))}`); break;
     case 'chasseur': L.push('Balle : ' + yes('prête')); break;
     case 'petite': L.push('Fenêtre : ' + (night && P.inside ? (G.player.peekOn ? no('vous épiez') : yes('touchez « Épier »')) : 'la nuit, depuis la maison')); L.push('Repérée par un loup : ' + (G.spotted.has(P) ? no('oui') : yes('non'))); break;
-    case 'maudit': if(G.vampOn || G.secret) L.push('Morsure de vampire : ' + (P.curseBit ? no('déjà repoussée une fois') : yes('la première sera repoussée'))); break;
+    case 'maudit': L.push('Malédiction : ' + yes('active') + ' (attaque ou morsure de nuit = échange des rôles)'); if(P.cursed) L.push(no(`Vous avez pris cette malédiction la nuit ${P.cursed}.`)); break;
     case 'ancien': L.push('Vie supplémentaire : ' + (P.usedLife ? no('utilisée') : yes('intacte'))); break;
     case 'sherif': L.push('Arrestation du jour : ' + (P.arrestDay === G.day ? no('déjà faite') : yes('disponible (le jour, au contact)'))); { const pr = prisoners(); if(pr.length) L.push('En prison : ' + pr.map(o => esc(o.name)).join(', ')); } break;
     case 'chaman': L.push('Cette nuit : ' + (night ? (G.powerUsed ? 'échange prévu pour l\'aube' : G.t > G.dur * 0.6 ? no('trop tard') : yes('à choisir')) : 'la prochaine nuit')); break;
@@ -2282,17 +2323,8 @@ function doBite(c,v){
     G.journal.push({ day:G.day, kind:'nuit', text:`Nuit ${G.day} : ${c.name} (vampire) n'a pas pu mordre chez ${ownerOf(h) ? ownerOf(h).name : v.name}, maison protégée par le gardien.` });
     return 'guarded';
   }
-  // villageois maudit : son sang repousse la première morsure, mais il dort et ne voit pas qui l'a mordu.
-  // Le vampire, lui, comprend qu'il a affaire au maudit. La morsure suivante prend normalement.
-  if(v.role === 'maudit' && !v.curseBit){
-    v.curseBit = G.day; G.vampBit = G.day; G.vampHaste = false;
-    tell(c, `Le sang ${de(v.name)} vous brûle les lèvres : c'est le villageois maudit ! Sa malédiction a repoussé cette morsure… la prochaine prendra.`, 'warn');
-    if(c.ai) c.notes.push({ about:v.id, type:'vamp_cursed', w:0, text:'', day:G.day, said:false });
-    if(v.ai) v.notes.push({ about:null, type:'cold', w:0, text:`Cette nuit, j'ai senti une brûlure au cou, et un froid terrible… mais je n'ai vu personne.`, day:G.day, said:false });
-    else if(isPlayer(v)) asPlayer(v, () => { playerNote(`Cette nuit, une brûlure au cou et un froid terrible : quelque chose a tenté de vous mordre, mais votre sang maudit l'a repoussé. Vous n'avez pas vu qui.`, null, 0, 'curse' + G.day); toast('Une brûlure au cou… votre sang maudit a repoussé une morsure. Vous n\'avez pas vu qui.', 'warn'); });
-    G.journal.push({ day:G.day, kind:'nuit', text:`Nuit ${G.day} : le sang du villageois maudit (${v.name}) a repoussé la morsure de ${c.name}.` });
-    return 'blocked';
-  }
+  // villageois maudit : la malédiction échange les rôles (le maudit devient vampire, le vampire devient le maudit)
+  if(v.role === 'maudit'){ curseSwap(v, c); return 'blocked'; }
   // l'ancien survit à la première morsure (comme à la première attaque d'un loup) : la nuit est perdue, mais il n'a pas vu qui
   if(v.role === 'ancien' && !v.usedLife){
     v.usedLife = true; G.vampBit = G.day; G.vampHaste = false;
@@ -6843,6 +6875,102 @@ function voiceUpdate(){
     a.volume = clamp(g * (AUD.on === false ? 0 : 1) * VOLS.voice / 100 * VOLS.master / 100, 0, 1);
   }
 }
+
+</script>
+<script>/* js/diag.js */
+'use strict';
+/* =========================================================
+   diag.js — diagnostic d'affichage (menu → « Diagnostic d'affichage »).
+   Enchaîne 5 courts tests visuels avec un compteur qui doit défiler.
+   Le joueur note le premier test où l'écran se fige ; le jeu mesure
+   en même temps la cadence réelle des images. Le rapport est gardé
+   puis affiché au redémarrage de la page, avec un bouton « Copier ».
+   ========================================================= */
+const DIAG_TESTS = [
+  { k:'page',   name:'Page seule',                 dur:5 },
+  { k:'canvas', name:'Dessin simple',              dur:5 },
+  { k:'decor',  name:'Grand décor',                dur:5 },
+  { k:'jeu',    name:'Vrai jeu (carte de rôle)',   dur:6 },
+  { k:'nodraw', name:'Vrai jeu, village non dessiné', dur:6 },
+  // le village dessiné, mais une partie du dessin coupée à chaque fois : pour trouver ce qui ralentit
+  { k:'jeu', name:'Sans l’ombre hors du champ de vision', dur:5, off:() => { const f = window.drawDarkness; window.drawDarkness = function(){}; return () => { window.drawDarkness = f; }; } },
+  { k:'jeu', name:'Sans les personnages', dur:5, off:() => { const f = window.drawChar; window.drawChar = function(){}; return () => { window.drawChar = f; }; } },
+  { k:'jeu', name:'Sans le sol du village', dur:5, off:() => { const f = STATIC, e = document.createElement('canvas'); e.width = e.height = 1; STATIC = e; return () => { STATIC = f; }; } },
+  { k:'jeu', name:'Sans les toits et arbres', dur:5, off:() => { const f = TOPS, e = document.createElement('canvas'); e.width = e.height = 1; TOPS = e; return () => { TOPS = f; }; } },
+  { k:'jeu', name:'Sans objets, tâches et traces', dur:5, off:() => { const f = window.drawDynamic; window.drawDynamic = function(){}; return () => { window.drawDynamic = f; }; } },
+  { k:'jeu', name:'Sans cadre, teinte ni flèches', dur:5, off:() => { const a = window.drawTint, b = window.drawIndicators; window.drawTint = window.drawIndicators = function(){}; return () => { window.drawTint = a; window.drawIndicators = b; }; } }
+];
+function diagInfo(){
+  let gl = '?';
+  try { const c = document.createElement('canvas'), x = c.getContext('webgl'); const e = x && x.getExtension('WEBGL_debug_renderer_info'); gl = x ? (e ? x.getParameter(e.UNMASKED_RENDERER_WEBGL) : x.getParameter(x.RENDERER)) : 'pas de WebGL'; } catch(err){ gl = 'erreur'; }
+  return { v:GAME_VERSION, app:!!window.GALApp, ua:navigator.userAgent, dpr:window.devicePixelRatio, screen:screen.width + '×' + screen.height, view:innerWidth + '×' + innerHeight, gfx:SETTINGS.gfx || 'auto', gl };
+}
+function diagRun(){
+  const box = document.createElement('div'); box.id = 'diagBox';
+  box.innerHTML = `<div class="dg-top"><b id="dgName"></b><span id="dgHint">Le compteur doit défiler sans s'arrêter. Si l'écran se fige ou revient en arrière, notez le numéro du test.</span></div><div id="dgCount">0</div><div id="dgSq"></div>`;
+  document.body.appendChild(box);
+  const cv = document.createElement('canvas'); cv.id = 'diagCv'; document.body.insertBefore(cv, document.body.firstChild);
+  const res = [], info = diagInfo(); let i = -1, t0 = 0, last = 0, n = 0, maxGap = 0, long = 0, big = null, savedRender = null, savedRender2 = null, restoreOff = null, drawMs = 0, drawN = 0;
+  const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+  function setup(T){
+    drawMs = 0; drawN = 0; cv.style.display = 'none'; box.classList.toggle('small', T.k === 'jeu' || T.k === 'nodraw');
+    if(T.k === 'canvas' || T.k === 'decor'){ cv.style.display = 'block'; cv.width = Math.round(innerWidth * dpr); cv.height = Math.round(innerHeight * dpr); }
+    if(T.k === 'decor' && !big){ big = document.createElement('canvas'); big.width = 1536; big.height = 1152; const x = big.getContext('2d');
+      for(let k = 0; k < 900; k++){ x.fillStyle = `hsl(${k * 37 % 360},50%,60%)`; x.beginPath(); x.ellipse(Math.random() * 1536, Math.random() * 1152, 10 + Math.random() * 30, 8 + Math.random() * 20, Math.random() * 3, 0, 7); x.fill(); x.lineWidth = 2; x.stroke(); } }
+    if(T.k === 'jeu' || T.k === 'nodraw'){
+      if(T.k === 'nodraw'){ savedRender = window.render; window.render = function(){}; }
+      try { startGame(); } catch(e){ res.push({ k:T.k, err:String(e && e.message || e) }); }
+      if(T.off) restoreOff = T.off();
+      if(T.k === 'jeu'){ const r0 = window.render; drawMs = 0; drawN = 0; savedRender2 = r0; window.render = function(dt){ const t = performance.now(); r0(dt); drawMs += performance.now() - t; drawN++; }; }
+    }
+  }
+  function teardown(T){
+    if(T.k === 'jeu' || T.k === 'nodraw'){ if(savedRender2){ window.render = savedRender2; savedRender2 = null; } if(restoreOff){ restoreOff(); restoreOff = null; } try { $('#rolecard').hidden = true; quitToMenu(); } catch(e){} if(savedRender){ window.render = savedRender; savedRender = null; } }
+  }
+  function next(now){
+    if(i >= 0){ const T = DIAG_TESTS[i]; res.push({ k:T.k, name:T.name, fps:Math.round(n / ((now - t0) / 1000)), maxGap:Math.round(maxGap), long, js:drawN ? Math.round(drawMs / drawN * 10) / 10 : null }); teardown(T); }
+    i++;
+    if(i >= DIAG_TESTS.length){ diagFinish(info, res); return; }
+    const T = DIAG_TESTS[i]; $('#dgName').textContent = `Test ${i + 1}/${DIAG_TESTS.length} : ${T.name}`;
+    setup(T); t0 = now; last = now; n = 0; maxGap = 0; long = 0;
+  }
+  function tick(now){
+    if(i < 0 || now - t0 > DIAG_TESTS[i].dur * 1000){ next(now); if(i >= DIAG_TESTS.length) return; }
+    const gap = now - last; last = now; n++; if(gap > maxGap) maxGap = gap; if(gap > 100) long++;
+    $('#dgCount').textContent = n; $('#dgSq').style.transform = `rotate(${(now / 4) % 360}deg)`;
+    const T = DIAG_TESTS[i];
+    if(T.k === 'canvas' || T.k === 'decor'){ const x = cv.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0);
+      if(T.k === 'decor'){ const ox = (now / 20) % 500; x.drawImage(big, ox, 0, innerWidth, innerHeight, 0, 0, innerWidth, innerHeight); }
+      else { x.fillStyle = '#8cc84b'; x.fillRect(0,0,innerWidth,innerHeight); }
+      x.fillStyle = '#c8432b'; x.fillRect((now / 5) % innerWidth, innerHeight / 2, 40, 40); }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+function diagFinish(info, res){
+  try { localStorage.setItem('gal-diag', JSON.stringify({ info, res, at:Date.now() })); } catch(e){}
+  // on recharge la page : si l'affichage était figé, il repart de zéro
+  setTimeout(() => location.reload(), 200);
+}
+function diagReport(){
+  let d = null; try { d = JSON.parse(localStorage.getItem('gal-diag') || 'null'); } catch(e){}
+  if(!d) return;
+  const I = d.info, lines = [`Gare au Loup ${I.v} · ${I.app ? 'appli Android' : 'navigateur'}`, `Écran ${I.screen}, vue ${I.view}, densité ${I.dpr}, graphismes ${I.gfx}`, `Puce graphique : ${I.gl}`, I.ua, ''];
+  d.res.forEach((r,k) => lines.push(r.err ? `${k + 1}. ${r.k} : erreur ${r.err}` : `${k + 1}. ${r.name} : ${r.fps} images/s, plus long arrêt ${r.maxGap} ms, ${r.long} arrêt(s) > 0,1 s${r.js != null ? `, calcul du dessin ${r.js} ms` : ''}`));
+  const txt = lines.join('\n');
+  const el = document.createElement('div'); el.id = 'diagRep'; el.className = 'panel';
+  el.innerHTML = `<h3>Rapport du diagnostic</h3><p class="sub">Notez aussi le premier test où l'écran s'est figé, puis envoyez ce rapport.</p><pre>${esc(txt)}</pre><div class="row2"><button class="btn" id="dgCopy">Copier le rapport</button><button class="ghost" id="dgClose">Fermer</button></div>`;
+  document.body.appendChild(el);
+  $('#dgCopy').onclick = () => { const done = () => { $('#dgCopy').textContent = 'Copié !'; };
+    try { navigator.clipboard.writeText(txt).then(done, () => { diagSelect(el); }); } catch(e){ diagSelect(el); } };
+  $('#dgClose').onclick = () => { el.remove(); try { localStorage.removeItem('gal-diag'); } catch(e){} };
+}
+function diagSelect(el){ const r = document.createRange(); r.selectNodeContents(el.querySelector('pre')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); try { document.execCommand('copy'); } catch(e){} }
+document.addEventListener('DOMContentLoaded', () => {
+  const b = document.getElementById('optDiag'); if(b) b.onclick = () => { if(!confirmDiag()) return; diagRun(); };
+  setTimeout(diagReport, 300);
+});
+function confirmDiag(){ return true; }
 
 </script>
 <script type="text/x-glue">/* js/glue.js */
