@@ -7,7 +7,7 @@
       le reste de cette page n'est pas exécuté et elle est remplacée par la version reçue.
    2) Sinon, on garde une copie intacte de la page, pour pouvoir l'envoyer à des amis
       qui auraient une version plus ancienne. */
-var GAL_BOOT = { v:'0.38', src:null, running:null, failed:null };
+var GAL_BOOT = { v:'0.39', src:null, running:null, failed:null };
 (function(){
   function newer(a,b){ a = String(a).split('.').map(Number); b = String(b).split('.').map(Number);
     for(var i = 0; i < Math.max(a.length, b.length); i++){ var x = a[i] || 0, y = b[i] || 0; if(x !== y) return x > y; } return false; }
@@ -497,6 +497,14 @@ html.rot.ln #chat{left:8px;right:8px;width:auto;bottom:8px;max-height:56%;}
 #diagRep{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9100;width:min(94vw,560px);max-height:90vh;overflow:auto;}
 #diagRep pre{white-space:pre-wrap;font-size:12.5px;background:#fff;border:2px solid #2b1d14;border-radius:8px;padding:8px;}
 #diagRep .row2{display:flex;gap:10px;justify-content:flex-end;}
+
+#onModeRow[hidden],#optAdv[hidden]{display:none !important;}
+#optAdvBtn{margin:6px 0 2px;}
+#adBox{box-sizing:border-box;position:fixed;inset:0;z-index:9500;display:grid;place-items:center;background:rgba(20,22,51,.78);padding:16px;}
+#adBox .ad-card{box-sizing:border-box;background:var(--paper,#fff6e3);border:3px solid var(--ink,#2b1d14);border-radius:14px;padding:14px;width:min(92vw,440px);text-align:center;box-shadow:4px 4px 0 var(--ink,#2b1d14);}
+#adBox small{display:block;text-align:left;color:#6b5a48;font-size:12px;letter-spacing:.05em;text-transform:uppercase;}
+#adBox .ad-slot{margin:8px 0;min-height:180px;border:2px dashed #b9a88f;border-radius:10px;display:grid;place-items:center;color:#6b5a48;padding:12px;}
+#adBox p{margin:8px 0;font-size:16px;}
 </style>
 
 <canvas id="cv" aria-label="Le village vu du dessus"></canvas>
@@ -546,7 +554,9 @@ html.rot.ln #chat{left:8px;right:8px;width:auto;bottom:8px;max-height:56%;}
       <div class="row"><span class="lab">Difficulté des IA</span><div class="seg"><button data-diff="facile">Facile</button><button data-diff="normal">Normal</button><button data-diff="difficile">Difficile</button></div></div>
       <div class="row"><span class="lab">Affichage</span><div class="seg"><button data-orient="auto">Auto</button><button data-orient="portrait">Portrait</button><button data-orient="paysage">Paysage</button></div></div>
       <div class="row"><span class="lab">Graphismes</span><div class="seg"><button data-gfx="auto">Auto</button><button data-gfx="fluide">Fluide</button><button data-gfx="nette">Détaillés</button><button data-gfx="compat">Compatibilité</button></div></div>
-      <div class="row"><span class="lab">Problème d'affichage ?</span><div class="seg"><button id="optDiag" type="button">Diagnostic d'affichage</button></div></div>
+      <button class="ghost small" id="optAdvBtn" type="button">▸ Paramètres avancés</button>
+      <div id="optAdv" hidden><div class="row"><span class="lab">Problème d'affichage ?</span><div class="seg"><button id="optDiag" type="button">Diagnostic d'affichage</button></div></div>
+        <div class="row" id="adPrevRow"><span class="lab">Publicités</span><div class="seg"><button id="optAdPrev" type="button">Aperçu de l'écran de publicité</button></div></div></div>
       <div class="toggles"><label><input type="checkbox" id="optReveal"> Révéler le rôle des éliminés</label><label title="Les éliminés deviennent des esprits invisibles qui aident un protégé"><input type="checkbox" id="optSpirits"> Esprits après la mort</label><label><input type="checkbox" id="optSound"> Son</label></div>
       <div class="cta">
         <button class="btn" id="playSolo">Jouer contre l'IA !</button>
@@ -661,7 +671,7 @@ html.rot.ln #chat{left:8px;right:8px;width:auto;bottom:8px;max-height:56%;}
   <div class="nhead"><h3 id="onTitle">Jouer en ligne</h3><button class="ghost" id="onClose">Retour</button></div>
   <div id="onBody">
     <div id="onConnect">
-      <div class="row"><span class="lab">Comment jouer en ligne ?</span><div class="seg" id="onMode"><button data-mode="p2p">Sans serveur : cet appareil héberge</button><button data-mode="srv">Avec un serveur de jeu</button></div></div>
+      <div class="row" id="onModeRow"><span class="lab">Comment jouer en ligne ?</span><div class="seg" id="onMode"><button data-mode="p2p">Sans serveur : cet appareil héberge</button><button data-mode="srv">Avec un serveur de jeu</button></div></div>
       <p class="sub" id="onModeHelp"></p>
       <label class="row" id="onSrvRow"><span class="lab">Adresse du serveur</span><input type="text" id="onSrv" placeholder="ex. panique-au-village.onrender.com" autocomplete="off"></label>
       <div class="onbtns">
@@ -709,7 +719,7 @@ html.rot.ln #chat{left:8px;right:8px;width:auto;bottom:8px;max-height:56%;}
    recherche de chemin (A*) et sons synthétiques.
    ========================================================= */
 
-const GAME_VERSION = '0.38';
+const GAME_VERSION = '0.39';
 const TS = 32, MW = 48, MH = 36;
 const T = { GRASS:0, PATH:1, STONE:2, LEAVES:3, WALL:4, TREE:5, WATER:6, HEDGE:7, CROP:8, TRAIL:9, CELL:10 };
 // CELL : la cellule de la prison — on n'y entre pas, mais on voit à travers les barreaux
@@ -6348,6 +6358,10 @@ function drawRoles2HUD(){
   }
 }
 
+// pris au piège : les commandes de déplacement ne répondent plus (solo et prédiction de l'invité en ligne)
+if(typeof readMove === 'function'){ const _rm = readMove;
+  readMove = function(){ const m = _rm.apply(this, arguments); return (G && G.player && G.player.alive && G.player.trapped && !G.spectator) ? { x:0, y:0, run:false } : m; }; }
+
 </script>
 <script>/* js/online.js */
 'use strict';
@@ -6428,9 +6442,12 @@ function onMsg(m){
 
 /* ---------- Salon d'attente ---------- */
 const ROLE_KEYS = ['pisteur','braconnier','sherif','guetteur','martyr','enchanteur','sangmele','chaman'];
-function onlineMode(){ try { return localStorage.getItem('gal-mode') || (NET.defaultUrl() ? 'srv' : 'p2p'); } catch(e){ return 'p2p'; } }
+// le jeu avec un serveur dédié n'est pas encore ouvert : seul le mode « sans serveur » est proposé
+const SERVER_MODE = false;
+function onlineMode(){ if(!SERVER_MODE) return 'p2p'; try { return localStorage.getItem('gal-mode') || (NET.defaultUrl() ? 'srv' : 'p2p'); } catch(e){ return 'p2p'; } }
 function modeRender(){
   const md = onlineMode(), def = NET.defaultUrl();
+  { const r = document.getElementById('onModeRow'); if(r) r.hidden = !SERVER_MODE; }
   document.querySelectorAll('#onMode button').forEach(b => b.classList.toggle('on', b.dataset.mode === md));
   $('#onSrvRow').hidden = md !== 'srv' || !!def;
   $('#onQuick').hidden = md !== 'srv';
@@ -6703,7 +6720,7 @@ function predictMove(dt){
   const ph = G.phase, m = readMove();
   if(G.spectator){ if(m.x || m.y){ NET.predict = true; const sp = P.ghost ? SPEED * SPIRIT_SPEED * (m.run ? 1.5 : 1) : SPEED * 2; P.x = clamp(P.x + m.x * sp * dt, 0, MW * TS); P.y = clamp(P.y + m.y * sp * dt, 0, MH * TS); P.moving = true; P.anim += dt * 6; if(m.x) P.facing = m.x > 0 ? 1 : -1; } else P.moving = false; return; }
   if(P.jailed && P.alive && G.modal !== 'esc' && !ESCUI.cur && (ph === 'day' || ph === 'dusk' || ph === 'night' || ph === 'dawn')){ NET.predict = jailMove(P, dt, m); return; }
-  if(!P.alive || P.inside || P.jailed || G.modal === 'mini' || ph === 'meeting' || ph === 'morning' || ph === 'none'){ P.moving = false; return; }
+  if(!P.alive || P.inside || P.jailed || P.trapped || G.modal === 'mini' || ph === 'meeting' || ph === 'morning' || ph === 'none'){ P.moving = false; return; }
   const sp = SPEED * (m.run ? 1.6 : 1) * (isWolfForm(P) ? 1.15 : 1) * dt, r = 9; let moved = false;
   if(m.x){ const nx = P.x + m.x * sp; if(!collides(nx, P.y, r)){ P.x = nx; moved = true; } }
   if(m.y){ const ny = P.y + m.y * sp; if(!collides(P.x, ny, r)){ P.y = ny; moved = true; } }
@@ -7484,6 +7501,54 @@ document.addEventListener('DOMContentLoaded', () => {
     ? "L'affichage était trop lent : le jeu passe en Graphismes « Compatibilité » et relance la partie."
     : "La dernière partie ne semblait pas s'afficher : le jeu passe en Graphismes « Compatibilité ». Vous pouvez revenir à « Auto » dans les réglages.", 'warn'), 800);
   if(auto) setTimeout(() => { const b = document.getElementById('playSolo'); if(b && b.onclick) b.onclick(); }, 1200);
+});
+
+</script>
+<script>/* js/ads.js */
+'use strict';
+/* =========================================================
+   ads.js — publicité courte (5 à 10 s) au lancement d'une partie.
+   DÉSACTIVÉE pendant la phase de test : ADS.on vaut false.
+   Pour l'activer une fois les tests du Play Store terminés :
+     python3 build.py --ads        (ou mettre ADS_ON à true ci-dessous)
+   L'annonce elle-même vient de l'appli Android (régie publicitaire,
+   par exemple AdMob) via le pont GALApp.showAd(secondes) ; l'appli
+   appelle ensuite window.galAdDone(). Sans régie, rien n'est affiché :
+   les joueurs n'attendent jamais pour rien.
+   ========================================================= */
+const ADS_ON = false;
+const ADS = { on:ADS_ON, min:5, max:10, busy:false };
+
+function adProvider(){ return !!(window.GALApp && typeof GALApp.showAd === 'function'); }
+// affiche l'écran de publicité puis appelle done() ; preview = aperçu depuis les paramètres avancés
+function adShow(done, preview){
+  if(ADS.busy) return;
+  if(!preview && (!ADS.on || !adProvider())){ done && done(); return; }
+  ADS.busy = true;
+  const secs = ADS.min + Math.floor(Math.random() * (ADS.max - ADS.min + 1));
+  const box = document.createElement('div'); box.id = 'adBox';
+  box.innerHTML = `<div class="ad-card"><small>Publicité</small><div class="ad-slot" id="adSlot">${preview ? 'Ici s\'affichera l\'annonce de la régie publicitaire.' : ''}</div><p id="adCount"></p><button class="btn" id="adGo" disabled>Jouer</button></div>`;
+  document.body.appendChild(box);
+  let left = secs, over = false;
+  const finish = () => { if(over) return; over = true; clearInterval(tm); box.remove(); ADS.busy = false; done && done(); };
+  const tick = () => {
+    $('#adCount').textContent = left > 0 ? `La partie commence dans ${left} s…` : 'La partie peut commencer !';
+    if(left <= 0){ const b = $('#adGo'); b.disabled = false; b.onclick = finish; clearInterval(tm); setTimeout(finish, 1500); }
+    left--;
+  };
+  const tm = setInterval(tick, 1000); tick();
+  window.galAdDone = () => { left = Math.min(left, 0); tick(); };
+  if(!preview && adProvider()){ try { GALApp.showAd(secs); } catch(e){ finish(); } }
+}
+// au lancement d'une partie contre l'IA
+{ const _safe = safeStart; safeStart = function(){ const a = arguments, self = this; if(!ADS.on){ return _safe.apply(self, a); }
+  adShow(() => _safe.apply(self, a)); }; }
+// en ligne : l'écran s'affiche par-dessus la carte de rôle, sans retarder les autres joueurs
+if(typeof gameInit === 'function'){ const _gi = gameInit; gameInit = function(){ const r = _gi.apply(this, arguments); if(ADS.on) setTimeout(() => adShow(null), 300); return r; }; }
+document.addEventListener('DOMContentLoaded', () => {
+  const adv = document.getElementById('optAdvBtn'), box = document.getElementById('optAdv');
+  if(adv && box) adv.onclick = () => { box.hidden = !box.hidden; adv.textContent = (box.hidden ? '▸' : '▾') + ' Paramètres avancés'; };
+  const pv = document.getElementById('optAdPrev'); if(pv) pv.onclick = () => adShow(null, true);
 });
 
 </script>
