@@ -5,129 +5,265 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Game Wouiki - Mes jeux en ligne</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&display=swap" rel="stylesheet">
+
   <style>
-    * {
-      box-sizing: border-box;
+    /* Charte graphique reprise de « Panique au village » */
+    :root {
+      --ink: #1d1410;
+      --paper: #fff8e6;
+      --paper-2: #f5e8c6;
+      --caption: #ffe36e;
+      --red: #e0412c;
+      --blue: #3d63b8;
+      --green: #4f9a2f;
+      --sky: #7cc6ef;
+      --ink-dim: #5a4a3c;
+      --night: #141633;
+      --f-sfx: "Bangers", Impact, "Arial Black", sans-serif;
+      --f-bd: "Patrick Hand", "Comic Sans MS", "Segoe Print", cursive;
+      --shadow: 4px 4px 0 var(--ink);
     }
+
+    * { box-sizing: border-box; }
+
+    html { background: #ff9f6b; }
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1020;
-      color: #f4f7ff;
+      font-family: var(--f-bd);
+      font-size: 18px;
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(rgba(29,20,16,.13) 1.2px, transparent 1.6px) 0 0/9px 9px,
+        radial-gradient(circle at 85% 6%, #fffbe0 0 52px, rgba(255,240,170,.5) 54px, transparent 120px),
+        linear-gradient(180deg, #5fb3e6 0%, #a8d8ef 30%, #ffd38a 65%, #ff9f6b 100%);
     }
 
+    /* ---------- En-tête ---------- */
     header {
-      padding: 20px;
       text-align: center;
-      background: #141d33;
-      border-bottom: 2px solid #ffb52e;
+      padding: 32px 16px 10px;
     }
 
     .logo {
-      width: 80px;
-      height: 80px;
+      width: 90px;
+      height: 90px;
       object-fit: contain;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 50%;
+      box-shadow: var(--shadow);
+      padding: 6px;
     }
 
     header h1 {
-      margin: 10px 0 0;
-      font-size: 2rem;
+      font-family: var(--f-sfx);
+      font-weight: 400;
+      font-size: clamp(54px, 11vw, 110px);
+      line-height: .9;
+      letter-spacing: .02em;
+      margin: 14px 0 0;
+      color: #fff;
+      -webkit-text-stroke: 3px var(--ink);
+      paint-order: stroke fill;
+      text-shadow: 6px 6px 0 var(--red), 9px 9px 0 var(--ink);
+      transform: rotate(-3deg);
     }
 
-    header h1 span {
-      color: #ffb52e;
+    header h1 span { color: var(--caption); }
+
+    .slogan {
+      display: inline-block;
+      margin: 22px 0 0;
+      padding: 6px 16px;
+      font-size: 22px;
+      background: var(--caption);
+      border: 3px solid var(--ink);
+      box-shadow: var(--shadow);
+      transform: rotate(1.5deg);
     }
 
+    /* ---------- Intro (bulle de BD) ---------- */
     .intro {
+      max-width: 640px;
+      margin: 34px auto 10px;
+      padding: 0 16px;
+    }
+
+    .bubble {
+      position: relative;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px 20px;
       text-align: center;
-      padding: 40px 20px;
+    }
+
+    .bubble::after {
+      content: "";
+      position: absolute;
+      left: 48px;
+      bottom: -15px;
+      width: 22px;
+      height: 16px;
+      background: var(--paper);
+      border-right: 3px solid var(--ink);
+      border-bottom: 3px solid var(--ink);
+      transform: skewX(-35deg);
     }
 
     .intro h2 {
-      font-size: 2.4rem;
-      margin-bottom: 10px;
+      font-family: var(--f-sfx);
+      font-weight: 400;
+      letter-spacing: .03em;
+      font-size: clamp(28px, 5vw, 38px);
+      margin: 0 0 4px;
+      color: var(--blue);
     }
 
-    .intro p {
-      color: #a9b5ce;
-      font-size: 1.1rem;
-    }
+    .intro p { margin: 0; font-size: 20px; color: var(--ink-dim); }
 
+    /* ---------- Grille des jeux ---------- */
     .games {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 24px;
-      max-width: 1100px;
-      padding: 20px;
-      margin: auto;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 28px;
+      max-width: 1140px;
+      margin: 30px auto 0;
+      padding: 20px 16px 60px;
+      width: 100%;
     }
 
     .game {
-      background: #141d33;
-      border: 1px solid #ffffff22;
-      border-radius: 18px;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      box-shadow: 6px 6px 0 var(--ink);
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      transition: transform .12s, box-shadow .12s;
+    }
+
+    .game:nth-child(odd)  { transform: rotate(-.6deg); }
+    .game:nth-child(even) { transform: rotate(.6deg); }
+
+    .game:hover {
+      transform: rotate(0) translate(-2px, -3px);
+      box-shadow: 9px 9px 0 var(--ink);
     }
 
     .image {
-      padding: 30px 10px;
+      position: relative;
+      padding: 26px 10px;
       text-align: center;
       font-size: 5rem;
-      background: #202e4c;
+      line-height: 1;
+      border-bottom: 3px solid var(--ink);
+      background:
+        radial-gradient(rgba(29,20,16,.16) 1.2px, transparent 1.6px) 0 0/8px 8px,
+        var(--bg, var(--sky));
     }
 
+    .image .emoji { display: inline-block; filter: drop-shadow(3px 3px 0 var(--ink)); }
+
+    .tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-family: var(--f-sfx);
+      font-size: 15px;
+      letter-spacing: .05em;
+      line-height: 1;
+      padding: 5px 10px;
+      background: var(--caption);
+      border: 2px solid var(--ink);
+      box-shadow: 2px 2px 0 var(--ink);
+      transform: rotate(4deg);
+    }
+
+    .tag.new { background: var(--red); color: #fff; text-shadow: 1px 1px 0 var(--ink); }
+
     .content {
-      padding: 20px;
+      padding: 18px 20px 20px;
       display: flex;
       flex-direction: column;
       flex: 1;
     }
 
     .content h3 {
-      margin-top: 0;
-      font-size: 1.5rem;
+      font-family: var(--f-sfx);
+      font-weight: 400;
+      letter-spacing: .03em;
+      font-size: 30px;
+      line-height: 1;
+      margin: 0 0 8px;
     }
 
     .content p {
-      color: #a9b5ce;
-      line-height: 1.6;
+      margin: 0;
+      color: var(--ink-dim);
+      line-height: 1.35;
       flex: 1;
     }
 
     .button {
       display: block;
       text-align: center;
-      background: #ffb52e;
-      color: #171717;
-      font-weight: bold;
-      padding: 14px;
+      text-decoration: none;
+      margin-top: 18px;
+      padding: 9px 16px;
+      background: var(--red);
+      color: #fff;
+      font-family: var(--f-sfx);
+      font-size: 22px;
+      letter-spacing: .04em;
+      border: 3px solid var(--ink);
       border-radius: 10px;
-      margin-top: 15px;
+      box-shadow: var(--shadow);
+      text-shadow: 2px 2px 0 var(--ink);
+      transition: transform .08s, box-shadow .08s, background .12s;
     }
 
-    .button:hover {
-      background: #ffd37c;
+    .button:hover { background: #f05a40; }
+
+    .button:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0 var(--ink);
     }
 
+    .button:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+    /* ---------- Pied de page ---------- */
     footer {
       text-align: center;
-      padding: 30px 15px;
-      margin-top: 40px;
-      background: #141d33;
-      color: #a9b5ce;
+      margin-top: auto;
+      padding: 26px 15px 30px;
+      background: var(--night);
+      color: var(--paper-2);
+      border-top: 4px solid var(--ink);
+    }
+
+    footer p { margin: 6px 0; }
+
+    footer .sfx {
+      font-family: var(--f-sfx);
+      letter-spacing: .04em;
+      font-size: 22px;
+      color: var(--caption);
     }
 
     @media (max-width: 500px) {
-      .intro h2 {
-        font-size: 1.8rem;
-      }
-
-      .games {
-        grid-template-columns: 1fr;
-      }
+      body { font-size: 17px; }
+      .games { grid-template-columns: 1fr; gap: 24px; }
+      .game:nth-child(odd), .game:nth-child(even) { transform: none; }
     }
   </style>
 </head>
@@ -137,68 +273,102 @@
   <header>
     <img class="logo" src="logo-game-wouiki.png" alt="Logo Game Wouiki">
     <h1>Game <span>Wouiki</span></h1>
-    <p>Mes jeux en ligne</p>
+    <p class="slogan">Mes jeux en ligne</p>
   </header>
 
   <section class="intro">
-    <h2>🎮 Bienvenue dans la ludothèque !</h2>
-    <p>Choisis ton jeu et lance ton aventure.</p>
+    <div class="bubble">
+      <h2>🎮 Bienvenue dans la ludothèque !</h2>
+      <p>Choisis ton jeu et lance ton aventure.</p>
+    </div>
   </section>
 
   <main class="games">
 
     <article class="game">
-      <div class="image">🐺</div>
+      <div class="image" style="--bg:#8cc84b"><span class="emoji">🐺</span></div>
       <div class="content">
         <h3>Panique au village</h3>
         <p>
           Observe les autres joueurs, utilise la stratégie,
           bluffe et découvre les rôles cachés dans le village.
         </p>
-        <a class="button" href="./panique-au-village.html">
-          Jouer à Panique au village
-        </a>
+        <a class="button" href="./panique-au-village.html">Jouer à Panique au village</a>
       </div>
     </article>
 
     <article class="game">
-      <div class="image">🏛️</div>
+      <div class="image" style="--bg:#ffd38a"><span class="emoji">🏛️</span></div>
       <div class="content">
         <h3>Babel</h3>
         <p>
           Découvre Babel et relève les défis de ce jeu
           directement dans ton navigateur.
         </p>
-        <a class="button" href="./babel.html">
-          Jouer à Babel
-        </a>
+        <a class="button" href="./babel.html">Jouer à Babel</a>
       </div>
     </article>
 
     <article class="game">
-      <div class="image">🏰</div>
+      <div class="image" style="--bg:#ff9f6b"><span class="emoji">🏰</span></div>
       <div class="content">
         <h3>Bac à sable royal</h3>
         <p>
           Un battle royale déjanté où voitures miniatures
           et figurines s'affrontent dans des arènes amusantes.
         </p>
-        <a class="button" href="./bac-a-sable-royale.html">
-          Jouer à Bac à sable royal
-        </a>
+        <a class="button" href="./bac-a-sable-royale.html">Jouer à Bac à sable royal</a>
+      </div>
+    </article>
+
+    <article class="game">
+      <div class="image" style="--bg:#7cc6ef"><span class="tag new">Nouveau !</span><span class="emoji">📈</span></div>
+      <div class="content">
+        <h3>Coup bas en bourse</h3>
+        <p>
+          24 manches sur une bourse fictive où chaque entreprise
+          obéit à des règles secrètes. Perce leurs mystères,
+          noue des alliances et deviens le roi du marché !
+        </p>
+        <a class="button" href="./coup-bas-en-bourse.html">Jouer à Coup bas en bourse</a>
+      </div>
+    </article>
+
+    <article class="game">
+      <div class="image" style="--bg:#ffe36e"><span class="tag new">Nouveau !</span><span class="emoji">⚖️</span></div>
+      <div class="content">
+        <h3>Poids de panique</h3>
+        <p>
+          Trois balances, des mises secrètes et des cubes à poser
+          sans faire tout basculer. Bluffe, passe ton tour… et
+          laisse les autres ramasser les pénalités !
+        </p>
+        <a class="button" href="./poids-de-panique.html">Jouer à Poids de panique</a>
+      </div>
+    </article>
+
+    <article class="game">
+      <div class="image" style="--bg:#b9a6e8"><span class="tag new">Nouveau !</span><span class="emoji">🚓</span></div>
+      <div class="content">
+        <h3>Brigands, policiers et ripoux</h3>
+        <p>
+          Dans la métropole d'Alhéria, les brigands dévalisent
+          les coffres, les policiers enquêtent… et des ripoux
+          se cachent parmi eux. À qui faire confiance ?
+        </p>
+        <a class="button" href="./brigands-policiers-ripoux.html">Jouer à Brigands, policiers et ripoux</a>
       </div>
     </article>
 
   </main>
 
   <footer>
-    <p>Game Wouiki — Des idées, des énigmes, des aventures !</p>
+    <p class="sfx">Game Wouiki — Des idées, des énigmes, des aventures !</p>
     <p>© <span id="year"></span> Game Wouiki</p>
   </footer>
 
   <script>
-    document.getElementById("year").textContent =
-      new Date().getFullYear();
+    document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 
 </body>
