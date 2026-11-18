@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1fa3a0">
+<title>Coup Bas en Bourse</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iIzBiMTUzMCIvPgogIDxwb2x5bGluZSBwb2ludHM9IjcwLDM2MCAxNjAsMjgwIDIzMCwzMjAgMzIwLDE5MCA0NDAsMTMwIiBmaWxsPSJub25lIiBzdHJva2U9IiMyZWQzYzYiIHN0cm9rZS13aWR0aD0iMzQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxwb2x5bGluZSBwb2ludHM9IjcwLDE3MCAxNzAsMjQwIDI1MCwyMTAgMzMwLDMzMCA0NDAsMzkwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZjU0NzAiIHN0cm9rZS13aWR0aD0iMjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgb3BhY2l0eT0iLjgiLz4KICA8cGF0aCBkPSJNMzAwIDQyMCBMMzk1IDEyMCBMNDE1IDEyNiBMMzMwIDQyOCBaIiBmaWxsPSIjZjJjMTRlIi8+CiAgPHJlY3QgeD0iMzAwIiB5PSI0MDAiIHdpZHRoPSI3MCIgaGVpZ2h0PSIyMiIgcng9IjYiIHRyYW5zZm9ybT0icm90YXRlKDE4IDMzNSA0MTEpIiBmaWxsPSIjYzk4ZjFjIi8+Cjwvc3ZnPgo=">
+<style>
+/* Coup Bas en Bourse — charte visuelle reprise de « Panique au village » :
+   papier crème, ligne claire, contours noirs épais, ombres pleines façon BD. */
+:root {
+  --paper: #f3e6c4; --paper2: #ead7a8; --paper3: #fff6dc; --turq: #1fa3a0; --turq2: #137a78; --ocre: #d99a2b;
+  --brick: #b8452f; --green: #3f8f3a; --ink: #1b1b1b; --sea: #2e8fb8; --sand: #e9c97b; --violet: #7a4f9a; --gold: #ffd34d;
+  --line: 3px; --r: 14px; --shadow: 4px 4px 0 var(--ink); --w: 560px; --safe-b: env(safe-area-inset-bottom, 0px);
+  --up: var(--green); --down: var(--brick);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; color: var(--ink); font: 15px/1.4 "Trebuchet MS", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overscroll-behavior: none; }
+body { min-height: 100vh; background: radial-gradient(circle at 20% 10%, #35b0b3 0, #1d6f7a 45%, #124b55 100%) fixed; }
+button { font: inherit; color: inherit; cursor: pointer; }
+input, select, textarea { font: inherit; color: var(--ink); background: #fff; border: var(--line) solid var(--ink); border-radius: 10px; padding: 9px 11px; width: 100%; font-size: 15px; }
+input:focus, select:focus, textarea:focus { outline: 3px solid var(--ocre); outline-offset: 1px; }
+h1, h2, h3, .title { font-family: "Arial Black", "Trebuchet MS", Impact, sans-serif; letter-spacing: .4px; }
+.muted { opacity: .7; }
+.up { color: var(--up); } .down { color: var(--down); }
+b.gold, .gold-t { color: var(--brick); }
+.outline { color: #fff; text-shadow: -2px -2px 0 var(--ink), 2px -2px 0 var(--ink), -2px 2px 0 var(--ink), 2px 2px 0 var(--ink), 4px 4px 0 var(--ink); }
+
+.screen { display: none; min-height: 100vh; max-width: var(--w); margin: 0 auto; background: var(--paper); box-shadow: 0 0 0 3px var(--ink), 0 0 40px rgba(0, 0, 0, .4); }
+.screen.active { display: block; animation: fade .25s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+body.noanim * { animation: none !important; transition: none !important; }
+
+/* Boutons BD */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .4em; min-height: 46px; padding: .5em 1em; border: var(--line) solid var(--ink); border-radius: 12px; background: var(--ocre); box-shadow: var(--shadow); font-weight: 800; transition: transform .08s, box-shadow .08s; user-select: none; }
+.btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.btn:disabled { opacity: .45; filter: grayscale(.6); pointer-events: none; }
+.btn.gold { background: var(--gold); }
+.btn.turq { background: var(--turq); color: #fff; }
+.btn.ghost { background: var(--paper3); }
+.btn.big { width: 100%; min-height: 54px; font-size: 17px; }
+.btn.buy { background: var(--green); color: #fff; }
+.btn.sell { background: var(--brick); color: #fff; }
+.btn.small { min-height: 36px; padding: .25em .7em; font-size: 13px; box-shadow: 3px 3px 0 var(--ink); }
+.icon-btn { width: 42px; height: 42px; border: var(--line) solid var(--ink); border-radius: 10px; background: var(--paper3); color: var(--ink); font-size: 18px; display: grid; place-items: center; box-shadow: 2px 2px 0 var(--ink); padding: 0; flex: 0 0 auto; }
+
+/* Avatars */
+.av { display: inline-block; width: 44px; height: 44px; flex: 0 0 auto; }
+.av svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.av-emoji { display: inline-grid; place-items: center; width: 44px; height: 44px; font-size: 28px; flex: 0 0 auto; }
+
+/* Menu / héros */
+.hero { position: relative; overflow: hidden; border-bottom: var(--line) solid var(--ink); background: linear-gradient(#7fd3d6 0, #bfe9e6 62%, var(--sand) 63%, var(--sand) 80%, var(--sea) 81%); padding: 18px 10px 0; text-align: center; }
+.hero h1 { margin: 0; font-size: 40px; line-height: 1; }
+.hero h1 span { display: block; font-size: 30px; color: var(--gold); }
+.hero .sub { display: inline-block; margin-top: 10px; background: var(--brick); color: #fff; border: var(--line) solid var(--ink); border-radius: 8px; padding: .15em .7em; font-weight: 900; transform: rotate(-2deg); box-shadow: 3px 3px 0 var(--ink); }
+.hero-chart { display: block; width: 100%; height: 70px; margin-top: 4px; }
+.hero-cast { display: flex; justify-content: center; gap: 0; margin-top: -8px; padding-bottom: 6px; }
+.hero-cast .av { width: 58px; height: 58px; margin: 0 -4px; animation: bob 2.4s ease-in-out infinite; }
+.hero-cast .av:nth-child(2n) { animation-delay: .4s; } .hero-cast .av:nth-child(3n) { animation-delay: .8s; }
+@keyframes bob { 50% { transform: translateY(-5px); } }
+.menu-wrap { padding: 18px 16px 30px; display: flex; flex-direction: column; gap: 12px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid2 .btn { font-size: 14px; padding: .4em .4em; }
+.soon { opacity: .8; }
+.version { text-align: center; opacity: .65; font-size: 12px; margin-top: 6px; }
+
+/* Pages */
+.page { padding: 14px 12px 40px; display: flex; flex-direction: column; gap: 14px; }
+.page-head { display: flex; align-items: center; gap: 12px; }
+.page-head h2 { margin: 0; font-size: 22px; }
+.card { background: var(--paper3); border: var(--line) solid var(--ink); border-radius: var(--r); box-shadow: var(--shadow); padding: 12px; }
+.form { display: flex; flex-direction: column; gap: 14px; }
+.form label { display: flex; flex-direction: column; gap: 6px; font-weight: 800; font-size: 14px; }
+.form label b { color: var(--brick); }
+.lbl { font-weight: 800; font-size: 14px; margin-bottom: -8px; }
+.av-pick { display: flex; align-items: center; gap: 12px; }
+.av-pick .av { width: 110px; height: 110px; }
+.av-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; flex: 1; }
+.av-btns .btn { min-height: 38px; font-size: 13px; box-shadow: 3px 3px 0 var(--ink); padding: .2em .4em; }
+input[type=range] { padding: 0; accent-color: var(--brick); background: none; border: 0; }
+.diff { display: flex; justify-content: space-between; font-size: 13px; background: var(--paper2); border: 2px solid var(--ink); padding: 6px 10px; border-radius: 10px; margin-top: -6px; font-weight: 700; }
+details summary { font-weight: 800; font-size: 14px; cursor: pointer; }
+details label { margin-top: 10px; }
+.fixed-info { font-size: 12px; border-top: 2px dashed var(--ink); padding-top: 10px; opacity: .8; }
+
+/* Tableau de bord */
+.dash { position: sticky; top: 0; z-index: 20; background: var(--turq); color: #fff; border-bottom: var(--line) solid var(--ink); padding: 7px 10px 9px; }
+.dash-top { display: flex; align-items: center; gap: 8px; }
+.dash-top .round { flex: 1; font-weight: 800; text-shadow: 2px 2px 0 var(--ink); }
+.dash-top .round b { font-family: "Arial Black", sans-serif; color: var(--gold); font-size: 22px; }
+.round-bar { height: 8px; background: var(--paper3); border: 2px solid var(--ink); border-radius: 6px; margin-top: 6px; overflow: hidden; }
+.round-bar i { display: block; height: 100%; background: var(--ocre); }
+.timer { font-variant-numeric: tabular-nums; background: var(--paper3); color: var(--ink); border: var(--line) solid var(--ink); border-radius: 10px; padding: 3px 9px; font-weight: 900; min-width: 64px; text-align: center; box-shadow: 2px 2px 0 var(--ink); }
+.timer.urgent { background: var(--brick); color: #fff; animation: pulse 1s infinite; }
+@keyframes pulse { 50% { transform: scale(1.06); } }
+.rank { background: var(--gold); color: var(--ink); border: var(--line) solid var(--ink); border-radius: 10px; padding: 3px 9px; font-weight: 900; box-shadow: 2px 2px 0 var(--ink); }
+.rank small { font-weight: 700; opacity: .7; }
+.dash-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 8px; }
+.dash-stats div { background: var(--paper3); color: var(--ink); border: 2px solid var(--ink); border-radius: 10px; padding: 4px 7px; }
+.dash-stats small { display: block; font-size: 11px; font-weight: 700; opacity: .75; }
+.dash-stats b { font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dash-stats b.gold { color: var(--brick); }
+
+.tab-body { padding: 12px 10px calc(150px + var(--safe-b)); }
+
+/* Barre de tour + onglets (calées sur la colonne centrale) */
+.turnbar, .tabs { position: fixed; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--w); }
+.turnbar { bottom: calc(60px + var(--safe-b)); z-index: 25; display: flex; gap: 10px; align-items: center; padding: 8px 10px; background: var(--paper2); border-top: var(--line) solid var(--ink); }
+.turnbar .btn { flex: 0 0 auto; background: var(--gold); }
+.order-summary { flex: 1; font-size: 12px; line-height: 1.3; font-weight: 600; }
+.tabs { bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(6, 1fr); background: var(--turq2); border-top: var(--line) solid var(--ink); padding-bottom: var(--safe-b); }
+.tabs button { background: none; border: 0; padding: 6px 0 7px; font-size: 10.5px; font-weight: 800; color: #d8f3f2; display: flex; flex-direction: column; align-items: center; gap: 1px; position: relative; }
+.tabs button span { font-size: 19px; }
+.tabs button.on { color: var(--ink); background: var(--gold); box-shadow: inset 0 3px 0 var(--ink); }
+.badge { position: absolute; top: 3px; right: calc(50% - 22px); background: var(--brick); color: #fff; font-style: normal; font-size: 10px; font-weight: 900; border: 2px solid var(--ink); border-radius: 9px; padding: 0 5px; }
+
+/* Marché */
+.cards { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.co { position: relative; }
+.co::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background: var(--co); border-right: var(--line) solid var(--ink); border-radius: 11px 0 0 11px; }
+.co > * { margin-left: 8px; }
+.co-head { display: flex; align-items: center; gap: 10px; }
+.co-icon { font-size: 24px; width: 44px; height: 44px; display: grid; place-items: center; background: var(--co); border: var(--line) solid var(--ink); border-radius: 12px; box-shadow: 2px 2px 0 var(--ink); }
+.co-name { flex: 1; min-width: 0; }
+.co-name b { display: block; font-family: "Arial Black", sans-serif; font-size: 16px; }
+.co-name small { font-weight: 700; opacity: .7; }
+.co-price { text-align: right; }
+.co-price b { display: block; font-family: "Arial Black", sans-serif; font-size: 18px; font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; font-size: 12px; font-weight: 900; padding: 1px 7px; border-radius: 20px; border: 2px solid var(--ink); background: #fff; font-variant-numeric: tabular-nums; }
+.pill.up { background: var(--green); color: #fff; }
+.pill.down { background: var(--brick); color: #fff; }
+.co-mid { display: flex; align-items: center; gap: 12px; margin: 8px 0 8px 8px; }
+.spark { background: #fff; border: 2px solid var(--ink); border-radius: 8px; }
+.co-info { display: flex; flex-direction: column; font-size: 13px; gap: 1px; font-weight: 600; }
+.pend { font-size: 12px; font-weight: 900; }
+.pend.buy { color: var(--green); } .pend.sell { color: var(--brick); }
+.co-vol { font-size: 11.5px; font-weight: 600; background: var(--paper2); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 8px; margin-bottom: 8px; }
+.co-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Répartition des actions */
+.own { background: #fff; border: 2px solid var(--ink); border-radius: 10px; padding: 6px 9px; margin-bottom: 8px; font-size: 12px; font-weight: 600; }
+.own-top { display: flex; justify-content: space-between; gap: 8px; }
+.own-bar { display: flex; height: 12px; border-radius: 6px; background: var(--paper2); border: 2px solid var(--ink); overflow: hidden; margin: 6px 0 5px; }
+.own-bar i { display: block; height: 100%; transition: width .5s; border-right: 1.5px solid var(--ink); }
+.own-bar i:last-child { border-right: 0; }
+.own-bar i.me, .dot.me { background: var(--gold); }
+.own-bar i.oth, .dot.oth { background: var(--turq); }
+.dot.free { background: var(--paper2); }
+.own-leg { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 11.5px; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--ink); margin-right: 4px; vertical-align: -1px; }
+.overview { margin-bottom: 14px; }
+.overview summary { font-family: "Arial Black", sans-serif; font-size: 14px; }
+.overview summary b { color: var(--brick); }
+.overview .tbl { margin-top: 8px; font-size: 13px; }
+.mini-bar { display: inline-block; width: 46px; height: 8px; background: var(--paper2); border: 1.5px solid var(--ink); border-radius: 4px; margin-right: 6px; vertical-align: middle; overflow: hidden; }
+.mini-bar i { display: block; height: 100%; }
+
+/* Tables / listes */
+.section-title { font-family: "Arial Black", sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin: 10px 2px 8px; color: var(--turq2); }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th { text-align: left; font-weight: 800; font-size: 12px; padding: 6px 4px; border-bottom: 2px solid var(--ink); }
+.tbl td { padding: 7px 4px; border-bottom: 1px dashed rgba(0, 0, 0, .25); }
+.tbl .r { text-align: right; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.kpis div { background: var(--paper3); border: var(--line) solid var(--ink); border-radius: 12px; padding: 8px; box-shadow: 3px 3px 0 var(--ink); }
+.kpis small { font-size: 11px; font-weight: 700; display: block; opacity: .75; }
+.kpis b { font-size: 16px; }
+.empty { text-align: center; padding: 22px 10px; font-weight: 600; opacity: .8; }
+
+.rank-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 12px; background: var(--paper3); border: var(--line) solid var(--ink); box-shadow: 3px 3px 0 var(--ink); margin-bottom: 8px; }
+.rank-row.me { background: #ffe79a; }
+.rank-row .pos { width: 26px; font-family: "Arial Black", sans-serif; font-size: 18px; text-align: center; }
+.rank-row .av, .rank-row .av-emoji { width: 46px; height: 46px; }
+.rank-row .who { flex: 1; min-width: 0; }
+.rank-row .who b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-row .who small { font-size: 12px; font-weight: 600; opacity: .8; }
+.rank-row .w { text-align: right; font-variant-numeric: tabular-nums; font-weight: 900; }
+.rank-row .w small { display: block; font-weight: 700; font-size: 12px; }
+.tag-ai { display: inline-block; font-size: 10px; font-weight: 900; padding: 0 5px; border-radius: 5px; background: var(--turq); color: #fff; border: 1.5px solid var(--ink); margin-left: 4px; vertical-align: middle; }
+.mv { font-size: 12px; font-weight: 900; }
+
+/* Enquête */
+.inq-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 13px; }
+.stage-steps { display: flex; gap: 4px; }
+.stage-steps i { width: 24px; height: 10px; border-radius: 4px; background: var(--paper3); border: 2px solid var(--ink); }
+.stage-steps i.on { background: var(--turq); }
+.inq { margin-bottom: 14px; position: relative; }
+.inq::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background: var(--co); border-right: var(--line) solid var(--ink); border-radius: 11px 0 0 11px; }
+.inq > * { margin-left: 8px; }
+.inq h3 { margin: 0 0 8px 8px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.rule { background: #fff; border: 2px solid var(--ink); border-radius: 10px; padding: 9px; margin-bottom: 8px; }
+.rule-n { font-size: 11px; font-weight: 800; margin-bottom: 4px; display: flex; justify-content: space-between; }
+.rule-text { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 14px; line-height: 1.55; word-break: break-word; font-weight: 700; }
+.rule-text .q { color: rgba(27, 27, 27, .35); letter-spacing: 1px; }
+.bar { height: 8px; background: var(--paper2); border: 2px solid var(--ink); border-radius: 5px; margin-top: 7px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--turq); transition: width .6s; }
+.inq textarea { min-height: 54px; resize: vertical; font-size: 13px; }
+.mini-stats { font-size: 12px; font-weight: 600; margin-bottom: 7px; }
+
+/* Graphiques */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.chip { border: 2px solid var(--ink); background: var(--paper3); border-radius: 20px; padding: 4px 10px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 5px; box-shadow: 2px 2px 0 var(--ink); }
+.chip i { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--ink); display: inline-block; }
+.chip.off { opacity: .4; box-shadow: none; }
+canvas.chart { width: 100%; height: 260px; display: block; background: #fff; border: var(--line) solid var(--ink); border-radius: var(--r); box-shadow: var(--shadow); touch-action: pan-y; }
+.readout { font-size: 13px; font-weight: 600; margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px 12px; min-height: 20px; }
+.readout span { white-space: nowrap; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: var(--line) solid var(--ink); border-radius: 12px; overflow: hidden; box-shadow: 3px 3px 0 var(--ink); margin-bottom: 12px; }
+.seg button { min-height: 42px; border: 0; border-right: 2px solid var(--ink); background: var(--paper3); font-weight: 800; font-size: 13px; padding: 0 2px; white-space: nowrap; }
+.seg button:last-child { border-right: 0; }
+.seg button.on { background: var(--turq); color: #fff; }
+.seg button.on.b { background: var(--green); color: #fff; }
+.seg button.on.s { background: var(--brick); color: #fff; }
+.seg button:disabled { opacity: .4; }
+
+/* Graphique des actionnaires */
+.sh-row { display: grid; grid-template-columns: 92px 1fr 34px; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+.sh-row .nm { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sh-bar { display: flex; height: 22px; background: repeating-linear-gradient(45deg, #fff, #fff 4px, var(--paper2) 4px, var(--paper2) 8px); border: 2px solid var(--ink); border-radius: 7px; overflow: hidden; }
+.sh-bar i { display: block; height: 100%; border-right: 1.5px solid var(--ink); position: relative; }
+.sh-bar i.me { box-shadow: inset 0 0 0 2px var(--gold); }
+.sh-bar i b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 10px; color: #fff; font-style: normal; text-shadow: 1px 1px 0 var(--ink); }
+.sh-row .tot { font-weight: 900; font-size: 13px; text-align: right; }
+.sh-row.sel .sh-bar { box-shadow: 0 0 0 3px var(--gold); }
+.sh-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin-top: 10px; font-size: 12.5px; font-weight: 700; }
+.sh-legend div { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.sh-legend .av { width: 30px; height: 30px; }
+.sh-legend span.nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sh-detail { margin-top: 12px; }
+.sh-detail .holder { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px dashed rgba(0, 0, 0, .25); font-weight: 700; }
+.sh-detail .holder .av { width: 36px; height: 36px; }
+.sh-detail .holder .q { margin-left: auto; font-variant-numeric: tabular-nums; }
+.pie-wrap { display: flex; justify-content: center; margin: 8px 0; }
+
+/* Fil */
+.chat { display: flex; flex-direction: column; gap: 9px; }
+.msg { display: flex; gap: 6px; align-items: flex-start; }
+.msg .av, .msg .av-emoji { width: 40px; height: 40px; }
+.msg .bubble { background: var(--paper3); border: 2px solid var(--ink); border-radius: 4px 14px 14px 14px; padding: 6px 10px; max-width: 82%; box-shadow: 2px 2px 0 var(--ink); }
+.msg.me { flex-direction: row-reverse; }
+.msg.me .bubble { background: #ffe79a; border-radius: 14px 4px 14px 14px; }
+.msg.sys .bubble { background: var(--turq); color: #fff; }
+.msg .meta { font-size: 11px; font-weight: 800; margin-bottom: 2px; opacity: .8; }
+.chat-input { display: flex; gap: 8px; margin-top: 12px; position: sticky; bottom: calc(126px + var(--safe-b)); }
+.chat-channel { font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+
+/* Modale */
+.modal { position: fixed; inset: 0; z-index: 50; background: rgba(18, 75, 85, .72); display: flex; align-items: flex-end; justify-content: center; }
+.modal.hidden { display: none; }
+.sheet { background: var(--paper); border: var(--line) solid var(--ink); border-bottom: 0; border-radius: 20px 20px 0 0; width: 100%; max-width: var(--w); max-height: 88vh; overflow: auto; padding: 16px 14px calc(18px + var(--safe-b)); animation: up .22s ease; }
+@media (min-width: 700px) { .modal { align-items: center; } .sheet { border-radius: 20px; border-bottom: var(--line) solid var(--ink); box-shadow: 6px 6px 0 var(--ink); } }
+@keyframes up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sheet h2 { margin: 0 0 10px; font-size: 20px; }
+.sheet h3 { margin: 16px 0 6px; font-size: 16px; color: var(--brick); }
+.sheet .actions { display: flex; gap: 10px; margin-top: 16px; }
+.sheet .actions .btn { flex: 1; }
+.stepper { display: flex; align-items: center; gap: 6px; justify-content: center; margin: 14px 0; }
+.stepper button { width: 46px; height: 46px; border-radius: 12px; border: var(--line) solid var(--ink); background: var(--paper3); font-weight: 900; box-shadow: 2px 2px 0 var(--ink); }
+.stepper .qty { width: 80px; text-align: center; font-family: "Arial Black", sans-serif; font-size: 26px; background: #fff; padding: 4px; }
+.trade-sum { background: var(--paper3); border: 2px solid var(--ink); border-radius: 12px; padding: 9px 12px; font-size: 14px; display: grid; grid-template-columns: 1fr auto; gap: 4px; font-weight: 600; }
+.trade-sum .r { text-align: right; font-variant-numeric: tabular-nums; font-weight: 900; }
+.res-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px dashed rgba(0, 0, 0, .3); animation: fade .3s both; font-weight: 700; }
+.res-row .nm { flex: 1; }
+.res-row .px { font-variant-numeric: tabular-nums; font-size: 13px; }
+.res-row .px b { font-size: 15px; }
+.reveal-note { margin-top: 12px; background: var(--turq); color: #fff; border: var(--line) solid var(--ink); border-radius: 12px; padding: 9px 12px; font-weight: 800; box-shadow: 3px 3px 0 var(--ink); }
+.tuto-step { min-height: 170px; }
+.tuto-dots { display: flex; gap: 6px; justify-content: center; margin-top: 10px; }
+.tuto-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--paper3); border: 2px solid var(--ink); }
+.tuto-dots i.on { background: var(--brick); }
+.switch-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 2px dashed rgba(0, 0, 0, .25); font-weight: 700; }
+.switch-row input { width: auto; transform: scale(1.3); accent-color: var(--brick); }
+
+/* Fin */
+.winner { text-align: center; }
+.winner h2 { font-size: 24px; margin: 4px 0 0; }
+.podium { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: end; gap: 8px; margin: 10px 0 6px; }
+.pod { text-align: center; }
+.pod .av, .pod .av-emoji { width: 70px; height: 70px; }
+.pod.p1 .av { width: 86px; height: 86px; }
+.pod .nm { font-weight: 900; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pod .w { font-size: 12px; font-weight: 700; }
+.pod .block { margin-top: 6px; border: var(--line) solid var(--ink); border-bottom: 0; border-radius: 12px 12px 0 0; display: grid; place-items: center; font-family: "Arial Black", sans-serif; font-size: 30px; box-shadow: 3px 0 0 var(--ink); }
+.pod.p1 .block { height: 120px; background: var(--gold); }
+.pod.p2 .block { height: 88px; background: #d6dbe6; }
+.pod.p3 .block { height: 66px; background: #e0a06a; }
+.end-actions { display: flex; flex-direction: column; gap: 12px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(132px + var(--safe-b)); transform: translateX(-50%) translateY(20px); background: var(--ink); color: #fff; border: 2px solid #fff; padding: 9px 14px; border-radius: 12px; font-size: 14px; font-weight: 700; opacity: 0; pointer-events: none; transition: all .25s; z-index: 60; max-width: 90vw; text-align: center; }
+.toast.on { opacity: 1; transform: translateX(-50%); }
+
+</style>
+</head>
+<body>
+
+<!-- MENU PRINCIPAL -->
+<section id="screen-menu" class="screen active">
+  <div class="hero">
+    <h1 class="outline">Coup Bas<span class="outline">en Bourse</span></h1>
+    <div class="sub">24 manches pour dominer le marché</div>
+    <svg class="hero-chart" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true">
+      <polyline points="0,55 40,48 70,58 110,30 150,40 190,18 230,34 270,12 310,38 350,22 400,8" fill="none" stroke="#1b1b1b" stroke-width="7" stroke-linejoin="round"/>
+      <polyline points="0,55 40,48 70,58 110,30 150,40 190,18 230,34 270,12 310,38 350,22 400,8" fill="none" stroke="#3f8f3a" stroke-width="4" stroke-linejoin="round"/>
+      <polyline points="0,20 50,30 90,22 130,44 170,36 210,58 250,46 290,62 330,50 400,64" fill="none" stroke="#1b1b1b" stroke-width="7" stroke-linejoin="round"/>
+      <polyline points="0,20 50,30 90,22 130,44 170,36 210,58 250,46 290,62 330,50 400,64" fill="none" stroke="#b8452f" stroke-width="4" stroke-linejoin="round"/>
+    </svg>
+    <div class="hero-cast" id="hero-cast"></div>
+  </div>
+  <div class="menu-wrap">
+    <button class="btn gold big" id="m-solo">🎮 Jouer en solo</button>
+    <button class="btn turq big" id="m-resume" hidden>⏯️ Reprendre la partie</button>
+    <div class="grid2">
+      <button class="btn ghost soon" data-soon="Créer une partie">🏠 Créer une partie</button>
+      <button class="btn ghost soon" data-soon="Rejoindre une partie">🔑 Rejoindre</button>
+      <button class="btn ghost soon" data-soon="Parties publiques">🌍 Parties publiques</button>
+      <button class="btn ghost" id="m-rules">📜 Règles du jeu</button>
+      <button class="btn ghost" id="m-tuto">🎓 Tutoriel</button>
+      <button class="btn ghost" id="m-settings">⚙️ Paramètres</button>
+    </div>
+    <p class="version">v3 · mode solo jouable hors ligne · multijoueur en préparation</p>
+  </div>
+</section>
+
+<!-- CONFIGURATION SOLO -->
+<section id="screen-setup" class="screen">
+  <div class="page">
+    <div class="page-head"><button class="icon-btn" data-back="menu">←</button><h2>Partie solo</h2></div>
+    <div class="card form">
+      <label>Ton pseudo<input id="s-name" maxlength="18" autocomplete="off"></label>
+      <div class="lbl">Ton personnage</div>
+      <div class="av-pick"><span id="s-av-preview"></span>
+        <div class="av-btns">
+          <button type="button" class="btn ghost" data-avk="body">🎨 Couleur</button>
+          <button type="button" class="btn ghost" data-avk="hat">🎩 Chapeau</button>
+          <button type="button" class="btn ghost" data-avk="outfit">👕 Tenue</button>
+          <button type="button" class="btn ghost" data-avk="acc">👓 Accessoire</button>
+          <button type="button" class="btn ghost" data-avk="cloth">🧵 Tissu</button>
+          <button type="button" class="btn gold" data-avk="random">🎲 Hasard</button>
+        </div></div>
+      <label>Règles secrètes par entreprise : <b id="s-rules-val">2</b>
+        <input type="range" id="s-rules" min="1" max="5" step="1" value="2">
+      </label>
+      <div class="diff" id="s-diff"></div>
+      <label>Durée des manches
+        <select id="s-time">
+          <option value="0">Sans limite</option>
+          <option value="60">60 secondes</option>
+          <option value="120">120 secondes</option>
+          <option value="300">300 secondes</option>
+        </select>
+      </label>
+      <details><summary>Options avancées</summary>
+        <label>Graine (pour rejouer exactement une partie de test)<input id="s-seed" placeholder="vide = aléatoire" autocomplete="off"></label>
+      </details>
+      <div class="fixed-info">Fixe : 12 traders (toi + 11 IA) · 8 entreprises · 24 manches · 10 000 € de départ</div>
+    </div>
+    <button class="btn gold big" id="s-start">🚀 Lancer la partie</button>
+  </div>
+</section>
+
+<!-- JEU -->
+<section id="screen-game" class="screen">
+  <header class="dash" id="dash"></header>
+  <main id="tab-body" class="tab-body"></main>
+  <div class="turnbar">
+    <div id="order-summary" class="order-summary"></div>
+    <button id="btn-end" class="btn gold">Terminer mon tour</button>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="market" class="on"><span>📈</span>Marché</button>
+    <button data-tab="portfolio"><span>💼</span>Portefeuille</button>
+    <button data-tab="inquiry"><span>🔍</span>Enquête</button>
+    <button data-tab="ranking"><span>🏆</span>Classement</button>
+    <button data-tab="charts"><span>📊</span>Graphiques</button>
+    <button data-tab="chat"><span>💬</span>Fil<i class="badge" id="chat-badge" hidden></i></button>
+  </nav>
+</section>
+
+<!-- FIN DE PARTIE -->
+<section id="screen-end" class="screen"><div class="page" id="end-body"></div></section>
+
+<div id="modal" class="modal hidden"><div class="sheet" id="modal-body"></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* Coup Bas en Bourse — générateur pseudo-aléatoire à graine (déterministe).
+   Module sans DOM : utilisable dans le navigateur, Node (tests) et une fonction serveur (Deno). */
+(function (g) {
+  'use strict';
+  const CBB = g.CBB = g.CBB || {};
+
+  function hashStr(s) {
+    let h = 2166136261 >>> 0;
+    s = String(s);
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return h >>> 0;
+  }
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function makeRng(seed) {
+    const r = mulberry32(hashStr(seed));
+    return {
+      next: r,
+      int: (a, b) => a + Math.floor(r() * (b - a + 1)),
+      pick: arr => arr[Math.floor(r() * arr.length)],
+      chance: p => r() < p,
+      shuffle: arr => {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+        return a;
+      }
+    };
+  }
+
+  function randomSeed() {
+    return Math.floor(Math.random() * 2176782336).toString(36) + Date.now().toString(36).slice(-4);
+  }
+
+  CBB.rng = { hashStr, makeRng, randomSeed };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* Coup Bas en Bourse — constantes du jeu et entreprises. */
+(function (g) {
+  'use strict';
+  const CBB = g.CBB = g.CBB || {};
+
+  CBB.VERSION = '3.0.0';
+
+  CBB.CONFIG = Object.freeze({
+    ROUNDS: 24,
+    START_CASH: 10000,
+    START_PRICE: 1000,
+    SHARES: 100,
+    MAX_PLAYERS: 12,
+    CAP_PCT: 10,
+    MIN_PRICE: 10,
+    REVEAL_ROUNDS: [5, 10, 15, 20]
+  });
+
+  CBB.COMPANIES = Object.freeze([
+    { id: 'VOL', name: 'Voltis',   sector: 'Énergie',      icon: '⚡', color: '#e0a800' },
+    { id: 'MOV', name: 'Movia',    sector: 'Transport',    icon: '🚗', color: '#2e8fb8' },
+    { id: 'NEX', name: 'Nexora',   sector: 'Technologie',  icon: '💻', color: '#7a4f9a' },
+    { id: 'FIN', name: 'Financia', sector: 'Banque',       icon: '🏦', color: '#1fa3a0' },
+    { id: 'MER', name: 'Mercato',  sector: 'Commerce',     icon: '🛒', color: '#f08a3e' },
+    { id: 'BAT', name: 'Bâtiris',  sector: 'Construction', icon: '🏗️', color: '#a0522d' },
+    { id: 'AGR', name: 'Agréa',    sector: 'Agriculture',  icon: '🌾', color: '#3f8f3a' },
+    { id: 'VIT', name: 'Vitalis',  sector: 'Santé',        icon: '💊', color: '#e05a87' }
+  ]);
+
+  /* Couleurs des 12 places (graphique des actionnaires) */
+  CBB.PLAYER_COLORS = ['#b8452f', '#2e8fb8', '#3f8f3a', '#d99a2b', '#7a4f9a', '#1fa3a0', '#e57f9c', '#6b4a2b', '#f08a3e', '#2b5fa8', '#9aa63a', '#5c6b7a'];
+
+  CBB.DIFFICULTY = ['', 'Facile', 'Normale', 'Difficile', 'Expert', 'Très difficile'];
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* Coup Bas en Bourse — générateur procédural de règles secrètes + évaluation.
+   Chaque règle est une structure de données (type, paramètres, effet) ; son texte est
+   produit à partir de cette structure, donc le texte affiché correspond toujours au calcul. */
+(function (g) {
+  'use strict';
+  const CBB = g.CBB = g.CBB || {};
+  const N = 8;
+
+  const CATS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  const CAT_LABELS = {
+    A: 'Relation entre entreprises', B: 'Actions possédées', C: "Nombre d'actionnaires",
+    D: 'Achats', E: 'Ventes', F: 'Niveau du cours', G: 'Historique des cours', H: 'Cycle périodique'
+  };
+
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const nm = i => CBB.COMPANIES[i].name;
+  const verb = s => (s > 0 ? 'monte' : 'baisse');
+
+  function other(rng, t) { let x; do { x = rng.int(0, N - 1); } while (x === t); return x; }
+  function subject(rng, t) { return rng.chance(0.5) ? t : other(rng, t); }
+  function sign(rng) { return rng.chance(0.5) ? 1 : -1; }
+
+  function kindsFor(cat, np) {
+    switch (cat) {
+      case 'A': return ['prevMove'];
+      case 'B': return ['holdOne', 'holdTotal'];
+      case 'C': return np >= 2 ? ['holdersMin', 'holdersMax'] : ['holdersMax'];
+      case 'D': return np >= 2 ? ['buyOne', 'buyersMin', 'buyTotal'] : ['buyOne', 'buyTotal'];
+      case 'E': return np >= 2 ? ['sellOne', 'sellersMin', 'sellTotal'] : ['sellOne', 'sellTotal'];
+      case 'F': return ['below', 'above', 'below2'];
+      case 'G': return ['down2', 'up3', 'gtOther'];
+      case 'H': return ['every', 'even', 'odd'];
+    }
+    return [];
+  }
+
+  /* np = nombre réel de participants : les seuils s'y adaptent. */
+  function makeRule(rng, cat, t, np) {
+    const kind = rng.pick(kindsFor(cat, np));
+    const r = { target: t, cat, kind, pct: rng.int(2, 5), sign: sign(rng), x: null, params: {} };
+    const p = r.params;
+    switch (kind) {
+      case 'prevMove': r.x = other(rng, t); p.dir = sign(rng); break;
+      case 'holdOne': r.x = subject(rng, t); p.n = rng.int(4, 8); break;
+      case 'holdTotal': r.x = subject(rng, t); p.n = clamp(Math.round(np * rng.int(8, 20) / 10), 3, 60); break;
+      case 'holdersMin': r.x = subject(rng, t); p.k = rng.int(2, Math.max(2, Math.ceil(np * 0.45))); break;
+      case 'holdersMax': r.x = subject(rng, t); p.k = rng.int(2, Math.max(2, Math.ceil(np * 0.4))); break;
+      case 'buyOne': case 'sellOne': r.x = subject(rng, t); p.n = rng.int(3, 6); break;
+      case 'buyersMin': case 'sellersMin': r.x = subject(rng, t); p.k = rng.int(2, Math.max(2, Math.ceil(np * 0.25))); break;
+      case 'buyTotal': case 'sellTotal': r.x = subject(rng, t); p.n = clamp(Math.round(np * rng.int(4, 8) / 10), 3, 40); break;
+      case 'below': r.x = t; p.p = rng.int(45, 49) * 20; r.sign = 1; break;
+      case 'above': r.x = t; p.p = rng.int(21, 23) * 50; r.sign = -1; break;
+      case 'below2': r.x = t; p.p = rng.int(46, 49) * 20; r.sign = 1; break;
+      case 'down2': r.x = t; r.sign = 1; break;
+      case 'up3': r.x = t; r.sign = -1; break;
+      case 'gtOther': r.x = t; p.y = other(rng, t); break;
+      case 'every': r.x = t; p.k = rng.int(2, 5); break;
+      case 'even': case 'odd': r.x = t; break;
+    }
+    r.text = ruleText(r);
+    return r;
+  }
+
+  function ruleText(r) {
+    const T = nm(r.target), X = r.x != null ? nm(r.x) : '', p = r.params, pc = r.pct;
+    const self = r.x === r.target;
+    const E = s => (s ? `son cours ${verb(r.sign)} de ${pc} %` : `${T} ${verb(r.sign)} de ${pc} %`);
+    switch (r.kind) {
+      case 'prevMove': return `Si ${X} a ${p.dir > 0 ? 'monté' : 'baissé'} à la manche précédente, ${E(false)}.`;
+      case 'holdOne': return `Si un trader possède au moins ${p.n} actions de ${X}, ${E(self)}.`;
+      case 'holdTotal': return `Si au moins ${p.n} actions de ${X} sont détenues par les traders, ${E(self)}.`;
+      case 'holdersMin': return `Si au moins ${p.k} traders possèdent ${X}, ${E(self)}.`;
+      case 'holdersMax': return `Si moins de ${p.k} traders possèdent ${X}, ${E(self)}.`;
+      case 'buyOne': return `Si un trader achète au moins ${p.n} actions de ${X} pendant la manche, ${E(self)}.`;
+      case 'buyersMin': return `Si au moins ${p.k} traders achètent ${X} pendant la manche, ${E(self)}.`;
+      case 'buyTotal': return `Si au moins ${p.n} actions de ${X} sont achetées pendant la manche, ${E(self)}.`;
+      case 'sellOne': return `Si un trader vend au moins ${p.n} actions de ${X} pendant la manche, ${E(self)}.`;
+      case 'sellersMin': return `Si au moins ${p.k} traders vendent ${X} pendant la manche, ${E(self)}.`;
+      case 'sellTotal': return `Si au moins ${p.n} actions de ${X} sont vendues pendant la manche, ${E(self)}.`;
+      case 'below': return `Si ${T} est sous ${p.p} €, ${E(true)}.`;
+      case 'above': return `Si ${T} dépasse ${p.p} €, ${E(true)}.`;
+      case 'below2': return `Si ${T} reste sous ${p.p} € pendant deux manches, ${E(true)}.`;
+      case 'down2': return `Si ${T} a baissé deux manches de suite, ${E(true)}.`;
+      case 'up3': return `Si ${T} a monté trois manches de suite, ${E(true)}.`;
+      case 'gtOther': return `Si ${T} vaut plus que ${nm(p.y)} en début de manche, ${E(true)}.`;
+      case 'every': return `Toutes les ${p.k} manches, ${E(false)}.`;
+      case 'even': return `Pendant les manches paires, ${E(false)}.`;
+      case 'odd': return `Pendant les manches impaires, ${E(false)}.`;
+    }
+    return '';
+  }
+
+  /* Vérifie qu'une règle peut réellement être déclenchée avec np participants. */
+  function feasible(r, np) {
+    const S = CBB.CONFIG.SHARES, p = r.params;
+    if (r.x === null || r.x === undefined) return false;
+    if (r.kind === 'prevMove' && r.x === r.target) return false; // jamais d'auto-dépendance directe
+    switch (r.kind) {
+      case 'holdersMin': case 'buyersMin': case 'sellersMin': return p.k >= 1 && p.k <= np;
+      case 'holdersMax': return p.k >= 2;
+      case 'holdOne': case 'buyOne': case 'sellOne': return p.n >= 1 && p.n <= S;
+      case 'holdTotal': case 'buyTotal': case 'sellTotal': return p.n >= 1 && p.n <= S;
+      case 'every': return p.k >= 2 && p.k <= CBB.CONFIG.ROUNDS;
+      case 'gtOther': return p.y !== r.target;
+      default: return true;
+    }
+  }
+
+  function generate(seed, perCompany, np) {
+    const R = clamp(perCompany | 0, 1, 5);
+    const rng = CBB.rng.makeRng(seed + '|rules');
+    const rules = [];
+    for (let t = 0; t < N; t++) {
+      // catégories toutes différentes pour une même entreprise → diversité garantie
+      const cats = rng.shuffle(CATS).slice(0, R);
+      cats.forEach((cat, i) => {
+        let r, tries = 0;
+        do { r = makeRule(rng, cat, t, np); } while (!feasible(r, np) && ++tries < 30);
+        r.id = CBB.COMPANIES[t].id + '-' + (i + 1);
+        rules.push(r);
+      });
+    }
+    return rules;
+  }
+
+  const col = (m, c) => m.map(a => a[c]);
+  const sum = a => a.reduce((s, v) => s + v, 0);
+  const cnt = a => a.filter(v => v > 0).length;
+  const max = a => (a.length ? Math.max.apply(null, a) : 0);
+
+  /* ctx : { round, hist (cours, dernier = cours de la manche), holdings (après transactions),
+             buys, sells (quantités exécutées par joueur dans la manche) } */
+  function evaluate(r, ctx) {
+    const R = ctx.round, hist = ctx.hist, L = hist.length, P = hist[L - 1];
+    const p = r.params, x = r.x, t = r.target;
+    switch (r.kind) {
+      case 'prevMove': { if (L < 2) return false; const v = hist[L - 1][x] - hist[L - 2][x]; return p.dir > 0 ? v > 0 : v < 0; }
+      case 'holdOne': return max(col(ctx.holdings, x)) >= p.n;
+      case 'holdTotal': return sum(col(ctx.holdings, x)) >= p.n;
+      case 'holdersMin': return cnt(col(ctx.holdings, x)) >= p.k;
+      case 'holdersMax': return cnt(col(ctx.holdings, x)) < p.k;
+      case 'buyOne': return max(col(ctx.buys, x)) >= p.n;
+      case 'buyersMin': return cnt(col(ctx.buys, x)) >= p.k;
+      case 'buyTotal': return sum(col(ctx.buys, x)) >= p.n;
+      case 'sellOne': return max(col(ctx.sells, x)) >= p.n;
+      case 'sellersMin': return cnt(col(ctx.sells, x)) >= p.k;
+      case 'sellTotal': return sum(col(ctx.sells, x)) >= p.n;
+      case 'below': return P[t] < p.p;
+      case 'above': return P[t] > p.p;
+      case 'below2': return L >= 2 && hist[L - 1][t] < p.p && hist[L - 2][t] < p.p;
+      case 'down2': return L >= 3 && hist[L - 1][t] < hist[L - 2][t] && hist[L - 2][t] < hist[L - 3][t];
+      case 'up3': return L >= 4 && hist[L - 1][t] > hist[L - 2][t] && hist[L - 2][t] > hist[L - 3][t] && hist[L - 3][t] > hist[L - 4][t];
+      case 'gtOther': return P[t] > P[p.y];
+      case 'every': return R % p.k === 0;
+      case 'even': return R % 2 === 0;
+      case 'odd': return R % 2 === 1;
+    }
+    return false;
+  }
+
+  function computeDeltas(rules, ctx) {
+    const CAP = CBB.CONFIG.CAP_PCT;
+    const raw = new Array(N).fill(0), triggered = [];
+    rules.forEach(r => { if (evaluate(r, ctx)) { raw[r.target] += r.sign * r.pct; triggered.push(r.id); } });
+    return { raw, capped: raw.map(v => clamp(v, -CAP, CAP)), triggered };
+  }
+
+  CBB.rules = { CATS, CAT_LABELS, generate, makeRule, ruleText, feasible, evaluate, computeDeltas };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* Coup Bas en Bourse — système de règles masquées.
+   Chaque règle a un masque propre, fixé à la création : un ordre de révélation des mots.
+   Les paliers (manches 1/5/10/15/20) révèlent une part croissante des caractères,
+   de façon cumulative. Espaces et ponctuation sont toujours visibles. */
+(function (g) {
+  'use strict';
+  const CBB = g.CBB = g.CBB || {};
+
+  const STAGES = [
+    { from: 1, frac: 0.06, label: 'Presque tout masqué' },
+    { from: 5, frac: 0.25, label: '≈ 25 % révélé' },
+    { from: 10, frac: 0.50, label: '≈ 50 % révélé' },
+    { from: 15, frac: 0.75, label: '≈ 75 % révélé' },
+    { from: 20, frac: 1.00, label: 'Entièrement révélé' }
+  ];
+
+  function stageIndex(round) {
+    let s = 0;
+    for (let i = 0; i < STAGES.length; i++) if (round >= STAGES[i].from) s = i;
+    return s;
+  }
+
+  function tokenize(text) {
+    const re = /[\p{L}\p{N}]+/gu, toks = [];
+    let m;
+    while ((m = re.exec(text))) toks.push({ s: m.index, e: m.index + m[0].length, w: m[0] });
+    return toks;
+  }
+
+  function buildMask(text, rng) {
+    const toks = tokenize(text);
+    const names = new Set(CBB.COMPANIES.map(c => c.name));
+    const numIdx = toks.map((t, i) => (/^\p{N}+$/u.test(t.w) ? i : -1)).filter(i => i >= 0);
+    const lastNum = numIdx.length ? numIdx[numIdx.length - 1] : -1;
+    let effectTok = -1;
+    toks.forEach((t, i) => { if (t.w === 'monte' || t.w === 'baisse') effectTok = i; });
+
+    const keyed = toks.map((t, i) => {
+      let base;
+      if (i === lastNum) base = 3.0;                 // pourcentage : révélé en dernier
+      else if (numIdx.includes(i)) base = 1.5;       // seuils : tardifs
+      else if (i === effectTok) base = 1.2;          // sens de l'effet : assez tard
+      else if (names.has(t.w)) base = 0.7;           // entreprises : progressivement
+      else if (t.w.length <= 3) base = 0;            // petits mots : tôt
+      else base = 0.35;
+      return { i, k: base + rng.next() };
+    });
+    keyed.sort((a, b) => a.k - b.k);
+    const order = keyed.map(o => o.i);
+    const total = toks.reduce((a, t) => a + t.w.length, 0);
+    const counts = STAGES.map(st => {
+      if (st.frac >= 1) return toks.length;
+      let c = 0, ch = 0;
+      while (c < order.length && ch < st.frac * total) { ch += toks[order[c]].w.length; c++; }
+      return c;
+    });
+    return { order, counts, effectTok };
+  }
+
+  function view(text, mask, round) {
+    const st = stageIndex(round);
+    const rev = new Set(mask.order.slice(0, mask.counts[st]));
+    const toks = tokenize(text);
+    const chars = text.split('');
+    let revealed = 0, total = 0;
+    toks.forEach((t, i) => {
+      const len = t.e - t.s;
+      total += len;
+      if (rev.has(i)) revealed += len;
+      else for (let k = t.s; k < t.e; k++) chars[k] = '?';
+    });
+    return {
+      text: chars.join(''),
+      ratio: total ? revealed / total : 1,
+      effectRevealed: mask.effectTok >= 0 && rev.has(mask.effectTok),
+      stage: st
+    };
+  }
+
+  function nextRevealRound(round) {
+    const s = STAGES.find(st => st.from > round);
+    return s ? s.from : null;
+  }
+
+  CBB.reveal = { STAGES, stageIndex, tokenize, buildMask, view, nextRevealRound };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* Coup Bas en Bourse — traders IA (algorithmes locaux, aucun service payant).
+   Une IA ne reçoit QUE publicView() : elle ne voit les règles qu'au rythme des révélations. */
+(function (g) {
+  'use strict';
+  const CBB = g.CBB = g.CBB || {};
+  const N = 8;
+
+  const PROFILES = [
+    { key: 'prudent', label: 'Prudente', name: 'Mme Prudence', av: { body: 5, cloth: 6, hat: 9, outfit: 4, acc: 2, hatC: 0 }, reserve: 0.45, mom: 0.2, rev: 0.6, insight: 0.9, noise: 0.6, conc: 3, buyT: 1.2, sellT: 1.5, freq: 1, follow: 0, halfSell: true },
+    { key: 'agressif', label: 'Agressif', name: 'Rex le Requin', av: { body: 0, cloth: 5, hat: 4, outfit: 5, acc: 6, hatC: 1 }, reserve: 0.02, mom: 1.0, rev: 0, insight: 0.5, noise: 1.0, conc: 2, buyT: 0.2, sellT: 0.8, freq: 1, follow: 0 },
+    { key: 'opportuniste', label: 'Opportuniste', name: 'Opale la Renarde', av: { body: 9, cloth: 2, hat: 7, outfit: 2, acc: 3, hatC: 3 }, reserve: 0.15, mom: 0, rev: 1.4, insight: 0.6, noise: 0.6, conc: 3, buyT: 0.6, sellT: 1.0, freq: 1, follow: 0 },
+    { key: 'analyste', label: 'Analyste', name: 'Ada Calcul', av: { body: 10, cloth: 0, hat: 1, outfit: 3, acc: 2, hatC: 7 }, reserve: 0.15, mom: 0.3, rev: 0.3, insight: 1.6, noise: 0.3, conc: 3, buyT: 0.8, sellT: 1.0, freq: 1, follow: 0, plan: true },
+    { key: 'diversifie', label: 'Diversifiée', name: 'Mosaïk', av: { body: 7, cloth: 3, hat: 5, outfit: 0, acc: 0, hatC: 2 }, reserve: 0.1, mom: 0.3, rev: 0.4, insight: 0.6, noise: 0.8, conc: 7, buyT: -0.5, sellT: 2.5, freq: 1, follow: 0 },
+    { key: 'speculateur', label: 'Spéculateur', name: 'Lucky Flambeur', av: { body: 3, cloth: 3, hat: 3, outfit: 1, acc: 5, hatC: 5 }, reserve: 0, mom: 0.8, rev: 0.2, insight: 0.4, noise: 2.0, conc: 1, buyT: 0, sellT: 0.5, freq: 1, follow: 0 },
+    { key: 'patient', label: 'Patiente', name: 'Zen Tortue', av: { body: 4, cloth: 4, hat: 6, outfit: 2, acc: 4, hatC: 4 }, reserve: 0.2, mom: 0.1, rev: 0.8, insight: 1.0, noise: 0.5, conc: 3, buyT: 0.8, sellT: 2.0, freq: 3, follow: 0 },
+    { key: 'reactif', label: 'Réactif', name: 'Guépard Pressé', av: { body: 2, cloth: 1, hat: 2, outfit: 3, acc: 3, hatC: 1 }, reserve: 0.1, mom: 1.6, rev: 0, insight: 0.5, noise: 0.6, conc: 2, buyT: 0.5, sellT: 0.4, freq: 1, follow: 0 },
+    { key: 'suiveur', label: 'Suiveur', name: 'Mouton Bêêrnard', av: { body: 6, cloth: 0, hat: 10, outfit: 1, acc: 0, hatC: 0 }, reserve: 0.15, mom: 0.4, rev: 0, insight: 0.3, noise: 0.5, conc: 2, buyT: 0.5, sellT: 1.0, freq: 1, follow: 0.25 },
+    { key: 'contrariant', label: 'Contrariant', name: 'Crabe à Rebours', av: { body: 8, cloth: 1, hat: 8, outfit: 3, acc: 1, hatC: 1 }, reserve: 0.15, mom: -1.2, rev: 0.5, insight: 0.5, noise: 0.6, conc: 2, buyT: 0.6, sellT: 0.8, freq: 1, follow: -0.2 },
+    { key: 'stratege', label: 'Stratège', name: 'Maestro', av: { body: 1, cloth: 5, hat: 11, outfit: 5, acc: 7, hatC: 3 }, reserve: 0.2, mom: 0.4, rev: 0.5, insight: 1.3, noise: 0.4, conc: 3, buyT: 0.8, sellT: 1.0, freq: 1, follow: 0, plan: true }
+  ];
+  const byKey = {};
+  PROFILES.forEach(p => { byKey[p.key] = p; });
+  function profile(key) { return byKey[key] || PROFILES[0]; }
+
+  /* Probabilité qu'une règle CONNUE (entièrement révélée) se déclenche à la manche courante,
+     estimée uniquement avec des données publiques. */
+  function predict(k, v) {
+    const H = v.history, L = H.length, P = v.prices, r = v.round, p = k.params, t = k.target, x = k.x;
+    const last = v.log[v.log.length - 1];
+    switch (k.kind) {
+      case 'prevMove': return L >= 2 && (p.dir > 0 ? H[L - 1][x] > H[L - 2][x] : H[L - 1][x] < H[L - 2][x]) ? 1 : 0;
+      case 'below': return P[t] < p.p ? 1 : 0;
+      case 'above': return P[t] > p.p ? 1 : 0;
+      case 'below2': return L >= 2 && H[L - 1][t] < p.p && H[L - 2][t] < p.p ? 1 : 0;
+      case 'down2': return L >= 3 && H[L - 1][t] < H[L - 2][t] && H[L - 2][t] < H[L - 3][t] ? 1 : 0;
+      case 'up3': return L >= 4 && H[L - 1][t] > H[L - 2][t] && H[L - 2][t] > H[L - 3][t] && H[L - 3][t] > H[L - 4][t] ? 1 : 0;
+      case 'gtOther': return P[t] > P[p.y] ? 1 : 0;
+      case 'every': return r % p.k === 0 ? 1 : 0;
+      case 'even': return r % 2 === 0 ? 1 : 0;
+      case 'odd': return r % 2 === 1 ? 1 : 0;
+      case 'holdTotal': return last ? (last.held[x] >= p.n ? 0.85 : 0.15) : 0.1;
+      case 'holdersMin': return last ? (last.holders[x] >= p.k ? 0.85 : 0.15) : 0.1;
+      case 'holdersMax': return last ? (last.holders[x] < p.k ? 0.85 : 0.15) : 0.9;
+      case 'holdOne': return last ? (last.maxHold[x] >= p.n ? 0.8 : 0.2) : 0.1;
+      default: return 0.3; // achats / ventes : dépend des autres joueurs
+    }
+  }
+
+  function insightFor(v, c, prof) {
+    let s = 0;
+    v.rules.forEach(rule => {
+      if (rule.target !== c) return;
+      if (rule.known) s += rule.known.sign * rule.known.pct * predict(rule.known, v);
+      else if (rule.effectSign !== null) s += rule.effectSign * 1.2 * 0.5; // sens connu, conditions floues
+    });
+    return s * (0.5 + v.round / 24) * prof.insight;
+  }
+
+  function decide(v, prof, rng) {
+    const order = { buy: new Array(N).fill(0), sell: new Array(N).fill(0) };
+    const me = v.me, P = v.prices, H = v.history, L = H.length;
+    if (prof.freq > 1 && v.round !== 1 && v.round % prof.freq !== 0) return order;
+
+    const myRank = v.players.find(p => p.id === me.id).rank;
+    let reserve = prof.reserve;
+    if (v.round > 8 && myRank > v.players.length * 0.66) reserve *= 0.5; // adaptation : prend plus de risques s'il est distancé
+
+    const last = v.log[v.log.length - 1];
+    const scores = P.map((price, c) => {
+      const lastVar = L >= 2 ? (H[L - 1][c] - H[L - 2][c]) / H[L - 2][c] * 100 : 0;
+      const rev = (1000 - price) / 100;
+      const flow = last ? (last.buyVol[c] - last.sellVol[c]) / 2 : 0;
+      return prof.mom * lastVar + prof.rev * rev + insightFor(v, c, prof) + prof.follow * flow + prof.noise * (rng.next() * 2 - 1) * 3;
+    });
+
+    // plan : déclencher soi-même une règle connue favorable du type « achète au moins N actions »
+    const forced = new Array(N).fill(0);
+    if (prof.plan) v.rules.forEach(rule => {
+      const k = rule.known;
+      if (k && k.sign > 0 && (k.kind === 'buyOne' || k.kind === 'buyTotal') && k.x === k.target && k.params.n <= 8) {
+        forced[k.x] = Math.max(forced[k.x], k.params.n);
+        scores[k.x] += k.pct;
+      }
+    });
+
+    let cash = me.cash;
+    for (let c = 0; c < N; c++) {
+      const h = me.holdings[c];
+      if (h > 0 && scores[c] < -prof.sellT) {
+        const q = prof.halfSell ? Math.ceil(h / 2) : h;
+        order.sell[c] = q; cash += q * P[c];
+      }
+    }
+    const wealth = me.cash + me.holdings.reduce((a, h, c) => a + h * P[c], 0);
+    let budget = cash - reserve * wealth;
+    const cands = scores.map((s, c) => ({ c, s })).filter(o => order.sell[o.c] === 0 && (o.s > prof.buyT || forced[o.c] > 0))
+      .sort((a, b) => b.s - a.s).slice(0, prof.conc);
+    const tot = cands.reduce((a, o) => a + Math.max(0.1, o.s), 0);
+    cands.forEach(o => {
+      if (budget <= 0) return;
+      const c = o.c;
+      let q = Math.floor((budget * Math.max(0.1, o.s) / tot) / P[c]);
+      if (forced[c] && q < forced[c] && budget >= forced[c] * P[c]) q = forced[c];
+      q = Math.max(0, Math.min(q, v.stock[c], CBB.CONFIG.SHARES - me.holdings[c], Math.floor(budget / P[c])));
+      if (q > 0) { order.buy[c] = q; budget -= q * P[c]; }
+    });
+    return order;
+  }
+
+  /* Messages des IA : modèles de phrases, construits uniquement sur des informations publiques. */
+  function pickMessage(v, p, prof, rng, order) {
+    const C = CBB.COMPANIES, msgs = [];
+    const last = v.log[v.log.length - 1];
+    if (last) {
+      let best = 0;
+      for (let c = 1; c < N; c++) if (Math.abs(last.deltas[c]) > Math.abs(last.deltas[best])) best = c;
+      const d = last.deltas[best];
+      if (Math.abs(d) >= 3) {
+        msgs.push(`Quelqu'un a remarqué ${d > 0 ? 'la hausse' : 'la baisse'} de ${C[best].name} ?`);
+        msgs.push(`${C[best].name} ${d > 0 ? '+' : ''}${d} % ! Il y a forcément une règle derrière ça.`);
+      }
+    }
+    v.rules.forEach(rule => {
+      C.forEach((co, x) => {
+        if (x !== rule.target && rule.text.indexOf(co.name) >= 0 && rule.ratio < 1) msgs.push(`Je pense que ${C[rule.target].name} dépend de ${co.name}.`);
+      });
+      if (rule.effectSign !== null && !rule.known && rng.chance(0.2)) msgs.push(`D'après l'Enquête, une règle fait ${rule.effectSign > 0 ? 'monter' : 'baisser'} ${C[rule.target].name}…`);
+    });
+    const traded = order.buy.some(q => q > 0) || order.sell.some(q => q > 0);
+    if (!traded) msgs.push('Je préfère conserver mes actions cette manche.');
+    const bought = order.buy.map((q, c) => ({ q, c })).filter(o => o.q > 0);
+    if (bought.length && (prof.key === 'agressif' || prof.key === 'speculateur')) msgs.push(`J'achète du ${C[bought[0].c].name}, qui me suit ?`);
+    if (prof.key === 'contrariant') msgs.push('Quand tout le monde vend, moi j\'achète.');
+    if (prof.key === 'prudent') msgs.push('Gardez des liquidités, le marché est piégé.');
+    msgs.push(`Je cherche des partenaires pour analyser ${C[rng.int(0, N - 1)].name}.`);
+    if (CBB.CONFIG.REVEAL_ROUNDS.indexOf(v.round) >= 0) msgs.push('Nouvelles lettres révélées ! Regardez l\'Enquête.');
+    return msgs.length ? rng.pick(msgs) : null;
+  }
+
+  /* Joue une manche pour toutes les IA : décisions + quelques messages (fréquence limitée). */
+  function playRound(state) {
+    const M = CBB.market, r = state.round, said = [];
+    const ais = state.players.filter(p => p.isAI);
+    const orders = {};
+    ais.forEach(p => {
+      const v = M.publicView(state, p.id);
+      const prof = profile(p.profile);
+      const rng = CBB.rng.makeRng(state.seed + '|ai|' + p.id + '|' + r);
+      let o = decide(v, prof, rng);
+      const res = M.submitOrder(state, p.id, o, 'ai-' + p.id + '-' + r);
+      if (!res.ok) { o = { buy: new Array(N).fill(0), sell: new Array(N).fill(0) }; M.submitOrder(state, p.id, o, 'ai0-' + p.id + '-' + r); }
+      orders[p.id] = o;
+    });
+    if (!ais.length) return;
+    const crng = CBB.rng.makeRng(state.seed + '|chat|' + r);
+    const n = crng.chance(0.6) ? (crng.chance(0.35) ? 2 : 1) : 0;
+    for (let i = 0; i < n; i++) {
+      const p = crng.pick(ais);
+      if (said.indexOf(p.id) >= 0) continue;
+      const v = M.publicView(state, p.id);
+      const msg = pickMessage(v, p, profile(p.profile), crng, orders[p.id]);
+      if (msg) { state.chat.push({ round: r, from: p.id, name: p.name, av: p.av, isAI: true, text: msg, ts: Date.now() }); said.push(p.id); }
+    }
+  }
+
+  CBB.ai = { PROFILES, profile, decide, predict, playRound, pickMessage };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* Coup Bas en Bourse — moteur de partie : état, carnet d'ordres, résolution des manches.
+   Fonctions pures sur un état JSON sérialisable : le même code tournera côté serveur
+   (fonction Supabase / Deno) en multijoueur. Le client ne reçoit que publicView(). */
+(function (g) {
+  'use strict';
+  const CBB = g.CBB = g.CBB || {};
+  const N = 8;
+  const zeros = () => new Array(N).fill(0);
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const cfg = () => CBB.CONFIG;
+
+  function curPrices(s) { return s.history[s.history.length - 1]; }
+  function wealthOf(p, P) { let w = p.cash; for (let c = 0; c < N; c++) w += p.holdings[c] * P[c]; return w; }
+
+  function mkPlayer(id, name, av, isAI, profile) {
+    const C = cfg();
+    return { id, name, av, isAI, profile, cash: C.START_CASH, holdings: zeros(), cost: zeros(), proceeds: zeros(),
+      wealth: [C.START_CASH], ranks: [], lastNonce: null };
+  }
+
+  /* opts : { seed, rulesPerCompany (1-5), roundSeconds (0 = sans limite), humans:[{id,name,avatar}],
+             fillAI (bool), seats (nb total de places, 12 par défaut), aiProfiles:[clé...] } */
+  function createGame(opts) {
+    const C = cfg();
+    const o = opts || {};
+    const seed = String(o.seed || CBB.rng.randomSeed());
+    const R = clamp(o.rulesPerCompany || 2, 1, 5);
+    const seats = clamp(o.seats || C.MAX_PLAYERS, 1, C.MAX_PLAYERS);
+    const players = [];
+    (o.humans || []).slice(0, seats).forEach(h => players.push(mkPlayer(h.id, h.name, h.av || h.avatar || { seed: h.id }, false, null)));
+    if (o.fillAI !== false) {
+      const profs = o.aiProfiles || CBB.ai.PROFILES.map(p => p.key);
+      let i = 0;
+      while (players.length < seats) {
+        const pr = CBB.ai.profile(profs[i % profs.length]);
+        players.push(mkPlayer('AI' + (i + 1), pr.name, pr.av, true, pr.key));
+        i++;
+      }
+    }
+    if (!players.length) throw new Error('Aucun participant');
+    const rules = CBB.rules.generate(seed, R, players.length);
+    const mrng = CBB.rng.makeRng(seed + '|mask');
+    const masks = {};
+    rules.forEach(r => { masks[r.id] = CBB.reveal.buildMask(r.text, mrng); });
+    const s = {
+      version: 1, seed, createdAt: Date.now(),
+      config: { rulesPerCompany: R, roundSeconds: o.roundSeconds | 0, rounds: C.ROUNDS, seats: players.length },
+      round: 1, phase: 'trading', players,
+      history: [new Array(N).fill(C.START_PRICE)],
+      stock: new Array(N).fill(C.SHARES),
+      rules, masks, orders: {}, log: [], chat: []
+    };
+    const rk = rankMap(s);
+    players.forEach(p => p.ranks.push(rk[p.id]));
+    return s;
+  }
+
+  function normalizeOrder(o) {
+    const fix = a => { const r = zeros(); if (Array.isArray(a)) for (let c = 0; c < N; c++) r[c] = a[c] === undefined ? 0 : a[c]; return r; };
+    return { buy: fix(o && o.buy), sell: fix(o && o.sell) };
+  }
+
+  function validateOrder(s, pid, order) {
+    const C = cfg();
+    const p = s.players.find(x => x.id === pid);
+    if (!p) return { ok: false, error: 'Joueur inconnu' };
+    if (s.phase !== 'trading') return { ok: false, error: 'La manche est close' };
+    const o = normalizeOrder(order), P = curPrices(s);
+    let cost = 0, proceeds = 0;
+    for (let c = 0; c < N; c++) {
+      const b = o.buy[c], v = o.sell[c], name = CBB.COMPANIES[c].name;
+      if (!Number.isInteger(b) || !Number.isInteger(v) || b < 0 || v < 0) return { ok: false, error: 'Quantités entières et positives uniquement' };
+      if (b > 0 && v > 0) return { ok: false, error: `Achat et vente simultanés de ${name} impossibles` };
+      if (v > p.holdings[c]) return { ok: false, error: `Vous ne possédez que ${p.holdings[c]} action(s) ${name}` };
+      if (b > s.stock[c]) return { ok: false, error: `Seulement ${s.stock[c]} action(s) ${name} disponibles` };
+      if (p.holdings[c] + b > C.SHARES) return { ok: false, error: 'Dépassement du nombre d\'actions en circulation' };
+      cost += b * P[c]; proceeds += v * P[c];
+    }
+    if (cost > p.cash + proceeds) return { ok: false, error: 'Fonds insuffisants' };
+    return { ok: true, order: o, cost, proceeds };
+  }
+
+  /* nonce : identifiant unique côté client → protection contre les ordres en double. */
+  function submitOrder(s, pid, order, nonce) {
+    const p = s.players.find(x => x.id === pid);
+    if (!p) return { ok: false, error: 'Joueur inconnu' };
+    if (nonce && p.lastNonce === nonce) return { ok: true, duplicate: true };
+    const v = validateOrder(s, pid, order);
+    if (!v.ok) return v;
+    s.orders[pid] = { buy: v.order.buy, sell: v.order.sell, nonce: nonce || null };
+    p.lastNonce = nonce || null;
+    return { ok: true };
+  }
+
+  /* Répartition proportionnelle quand la demande dépasse le stock,
+     puis unités restantes au plus fort reste, départage déterministe par hachage public. */
+  function allocate(dem, avail, tieBreak) {
+    const D = dem.reduce((a, b) => a + b, 0);
+    if (D <= avail) return dem.slice();
+    const al = dem.map(d => Math.floor(d * avail / D));
+    let left = avail - al.reduce((a, b) => a + b, 0);
+    const ord = dem.map((d, i) => ({ i, f: d * avail / D - al[i], t: tieBreak(i) }))
+      .filter(o => dem[o.i] > al[o.i])
+      .sort((a, b) => b.f - a.f || a.t - b.t);
+    for (let k = 0; left > 0 && k < ord.length; k++) { al[ord[k].i]++; left--; }
+    return al;
+  }
+
+  function rankMap(s) {
+    const P = curPrices(s);
+    const arr = s.players.map(p => ({ id: p.id, w: wealthOf(p, P) })).sort((a, b) => b.w - a.w);
+    const m = {};
+    arr.forEach((o, i) => { m[o.id] = (i > 0 && o.w === arr[i - 1].w) ? m[arr[i - 1].id] : i + 1; });
+    return m;
+  }
+
+  function resolveRound(s) {
+    const C = cfg();
+    if (s.phase !== 'trading') throw new Error('Aucune manche en cours');
+    const r = s.round, P = curPrices(s).slice(), pl = s.players;
+    const buys = pl.map(zeros), sells = pl.map(zeros);
+    const before = pl.map(p => wealthOf(p, P));
+
+    // 1) ventes (toujours exécutables : le marché rachète)
+    pl.forEach((p, i) => {
+      const o = s.orders[p.id]; if (!o) return;
+      for (let c = 0; c < N; c++) {
+        const q = Math.min(Math.max(0, o.sell[c] | 0), p.holdings[c]);
+        if (q > 0) { const v = q * P[c]; p.holdings[c] -= q; p.cash += v; p.proceeds[c] += v; s.stock[c] += q; sells[i][c] = q; }
+      }
+    });
+    // 2) achats, répartis équitablement sur le stock disponible
+    for (let c = 0; c < N; c++) {
+      const dem = pl.map(p => { const o = s.orders[p.id]; return o ? Math.max(0, o.buy[c] | 0) : 0; });
+      const alloc = allocate(dem, s.stock[c], i => CBB.rng.hashStr(s.seed + '|alloc|' + r + '|' + c + '|' + pl[i].id));
+      pl.forEach((p, i) => {
+        let q = Math.min(alloc[i], Math.floor(p.cash / P[c]));
+        if (q <= 0) return;
+        const v = q * P[c];
+        p.cash -= v; p.holdings[c] += q; p.cost[c] += v; s.stock[c] -= q; buys[i][c] = q;
+      });
+    }
+    // 3) invariants : aucune transaction ne crée d'argent ni d'actions
+    pl.forEach((p, i) => {
+      if (Math.abs(wealthOf(p, P) - before[i]) > 1e-6) throw new Error('Invariant violé : patrimoine modifié par une transaction');
+      if (p.cash < 0) throw new Error('Invariant violé : liquidités négatives');
+    });
+    for (let c = 0; c < N; c++) {
+      const held = pl.reduce((a, p) => a + p.holdings[c], 0);
+      if (held + s.stock[c] !== C.SHARES) throw new Error('Invariant violé : nombre d\'actions');
+    }
+    // 4-6) évaluation des règles secrètes, somme des effets, plafond, application simultanée
+    const ctx = { round: r, hist: s.history, holdings: pl.map(p => p.holdings), buys, sells };
+    const res = CBB.rules.computeDeltas(s.rules, ctx);
+    const after = P.map((x, c) => Math.max(C.MIN_PRICE, Math.round(x * (1 + res.capped[c] / 100))));
+    const col = (m, c) => m.map(a => a[c]);
+    const per = f => Array.from({ length: N }, (_, c) => f(c));
+    const entry = {
+      round: r, before: P, after, deltas: res.capped, triggered: res.triggered,
+      buyVol: per(c => col(buys, c).reduce((a, b) => a + b, 0)),
+      sellVol: per(c => col(sells, c).reduce((a, b) => a + b, 0)),
+      buyers: per(c => col(buys, c).filter(v => v > 0).length),
+      sellers: per(c => col(sells, c).filter(v => v > 0).length),
+      maxBuy: per(c => Math.max.apply(null, col(buys, c))),
+      maxSell: per(c => Math.max.apply(null, col(sells, c))),
+      holders: per(c => pl.filter(p => p.holdings[c] > 0).length),
+      held: per(c => C.SHARES - s.stock[c]),
+      maxHold: per(c => Math.max.apply(null, pl.map(p => p.holdings[c]))),
+      myTrades: pl.map((p, i) => ({ id: p.id, buy: buys[i], sell: sells[i] }))
+    };
+    // 7) enregistrement
+    s.history.push(after);
+    s.log.push(entry);
+    pl.forEach(p => p.wealth.push(wealthOf(p, after)));
+    const rk = rankMap(s);
+    pl.forEach(p => p.ranks.push(rk[p.id]));
+    s.orders = {};
+    s.round++;
+    if (s.round > C.ROUNDS) s.phase = 'ended';
+    return entry;
+  }
+
+  function publicRule(s, rule, round, ended) {
+    if (ended) {
+      return { id: rule.id, target: rule.target, text: rule.text, ratio: 1, effectSign: rule.sign,
+        known: structured(rule), triggers: s.log.filter(e => e.triggered.indexOf(rule.id) >= 0).length };
+    }
+    const v = CBB.reveal.view(rule.text, s.masks[rule.id], round);
+    const full = v.ratio >= 1;
+    return { id: rule.id, target: rule.target, text: v.text, ratio: v.ratio, stage: v.stage,
+      effectSign: v.effectRevealed ? rule.sign : null, known: full ? structured(rule) : null };
+  }
+  function structured(r) {
+    return { kind: r.kind, cat: r.cat, target: r.target, x: r.x, pct: r.pct, sign: r.sign, params: Object.assign({}, r.params) };
+  }
+
+  /* Vue envoyée à un joueur : jamais la graine, jamais les règles non révélées,
+     jamais les portefeuilles détaillés des autres joueurs. */
+  function publicView(s, pid) {
+    const C = cfg();
+    const ended = s.phase === 'ended';
+    const r = Math.min(s.round, C.ROUNDS);
+    const P = curPrices(s);
+    const rk = rankMap(s);
+    const me = s.players.find(p => p.id === pid);
+    const myOrder = s.orders[pid];
+    return {
+      round: r, phase: s.phase, ended, config: Object.assign({}, s.config),
+      seed: ended ? s.seed : null,
+      prices: P.slice(), history: s.history.map(h => h.slice()), stock: s.stock.slice(),
+      players: s.players.map(p => ({
+        id: p.id, name: p.name, av: p.av || p.avatar, isAI: p.isAI, seat: s.players.indexOf(p), holdings: p.holdings.slice(),
+        profileLabel: p.isAI ? CBB.ai.profile(p.profile).label : null,
+        wealth: wealthOf(p, P), wealthHistory: p.wealth.slice(), ranks: p.ranks.slice(), rank: rk[p.id],
+        ready: !!s.orders[p.id]
+      })),
+      me: me ? {
+        id: me.id, cash: me.cash, holdings: me.holdings.slice(), cost: me.cost.slice(), proceeds: me.proceeds.slice(),
+        wealth: wealthOf(me, P), order: myOrder ? { buy: myOrder.buy.slice(), sell: myOrder.sell.slice() } : null
+      } : null,
+      rules: s.rules.map(rule => publicRule(s, rule, r, ended)),
+      log: s.log.map(e => {
+        const o = { round: e.round, before: e.before.slice(), after: e.after.slice(), deltas: e.deltas.slice(),
+          buyVol: e.buyVol, sellVol: e.sellVol, buyers: e.buyers, sellers: e.sellers, maxBuy: e.maxBuy,
+          maxSell: e.maxSell, holders: e.holders, held: e.held, maxHold: e.maxHold };
+        const mine = e.myTrades && e.myTrades.find(t => t.id === pid);
+        if (mine) o.mine = { buy: mine.buy.slice(), sell: mine.sell.slice() };
+        if (ended) o.triggered = e.triggered.slice();
+        return o;
+      }),
+      chat: s.chat.slice(-150)
+    };
+  }
+
+  CBB.market = { createGame, validateOrder, submitOrder, resolveRound, publicView, allocate, rankMap, wealthOf, curPrices, normalizeOrder };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* Coup Bas en Bourse — avatars : personnages ronds façon « Panique au village ».
+   SVG procédural, ligne claire, contours noirs épais. */
+(function (g) {
+  'use strict';
+  const CBB = g.CBB = g.CBB || {};
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  const Avatar = {
+    BODY: ['#4aa3df', '#1fa3a0', '#d99a2b', '#b8452f', '#3f8f3a', '#9b6fc4', '#e9c97b', '#e57f9c', '#7c8a99', '#f08a3e', '#5fc3a8', '#c7d94f'],
+    CLOTH: ['#2b5fa8', '#b8452f', '#3f8f3a', '#d99a2b', '#6b4a2b', '#1b1b1b', '#e8e0c8', '#7a4f9a'],
+    HATS: ['paille', 'beret', 'bandana', 'casquette', 'haut', 'fleurs', 'bob', 'plume', 'aucun', 'chignon', 'bonnet', 'couronne'],
+    OUTFITS: ['salopette', 'mariniere', 'foulard', 'gilet', 'collier', 'cravate'],
+    ACCS: ['aucun', 'moustache', 'lunettes', 'taches', 'barbe', 'boucle', 'sourcils', 'monocle'],
+
+    resolve(av) {
+      if (av && av.body != null && av.hat != null) return av;
+      const r = CBB.rng.makeRng(String((av && av.seed) || 7));
+      return { body: r.int(0, this.BODY.length - 1), cloth: r.int(0, this.CLOTH.length - 1), hat: r.int(0, this.HATS.length - 1),
+        outfit: r.int(0, this.OUTFITS.length - 1), acc: r.int(0, this.ACCS.length - 1), hatC: r.int(0, this.CLOTH.length - 1) };
+    },
+    random() { return this.resolve({ seed: Math.random().toString(36) }); },
+
+    /* av : objet avatar, ou ancien avatar emoji (chaîne) ; mood : neutral | happy | sus | angry | sad | shock */
+    html(av, mood, cls) {
+      if (typeof av === 'string') return `<span class="av-emoji ${cls || ''}">${av}</span>`;
+      return `<span class="av ${cls || ''}">${this.svg(av, mood)}</span>`;
+    },
+
+    svg(av, mood) {
+      const a = this.resolve(av);
+      const B = this.BODY[a.body % this.BODY.length], C = this.CLOTH[a.cloth % this.CLOTH.length], HC = this.CLOTH[(a.hatC == null ? 1 : a.hatC) % this.CLOTH.length];
+      const hat = this.HATS[a.hat % this.HATS.length], outfit = this.OUTFITS[a.outfit % this.OUTFITS.length], acc = this.ACCS[a.acc % this.ACCS.length];
+      const S = 'stroke="#1b1b1b" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"';
+      const m = mood || 'neutral';
+      let s = '';
+      s += `<ellipse cx="50" cy="95" rx="26" ry="4" fill="rgba(0,0,0,.18)"/>`;
+      s += `<ellipse cx="38" cy="91" rx="9" ry="5" fill="#6b4a2b" ${S}/><ellipse cx="62" cy="91" rx="9" ry="5" fill="#6b4a2b" ${S}/>`;
+      s += `<ellipse cx="50" cy="60" rx="33" ry="31" fill="${B}" ${S}/>`;
+      if (outfit === 'salopette') s += `<path d="M24 72 Q50 66 76 72 Q72 90 50 91 Q28 90 24 72Z" fill="${C}" ${S}/><path d="M33 70 L36 52 M67 70 L64 52" ${S} fill="none"/><circle cx="36" cy="54" r="2.4" fill="#ffd34d" stroke="#1b1b1b" stroke-width="1.5"/><circle cx="64" cy="54" r="2.4" fill="#ffd34d" stroke="#1b1b1b" stroke-width="1.5"/>`;
+      else if (outfit === 'mariniere') s += `<path d="M21 70 Q50 64 79 70 Q76 90 50 91 Q24 90 21 70Z" fill="#fff" ${S}/><path d="M23 76 Q50 71 77 76 M25 82 Q50 77 75 82 M30 87 Q50 83 70 87" stroke="${C}" stroke-width="3" fill="none"/>`;
+      else if (outfit === 'foulard') s += `<path d="M30 66 Q50 74 70 66 L66 72 Q50 80 34 72Z" fill="${C}" ${S}/><path d="M56 74 l8 12 l-10 -3z" fill="${C}" ${S}/>`;
+      else if (outfit === 'gilet') s += `<path d="M24 68 Q30 90 46 91 L46 68Z M76 68 Q70 90 54 91 L54 68Z" fill="${C}" ${S}/>`;
+      else if (outfit === 'cravate') s += `<path d="M44 68 L56 68 L53 73 L57 88 L50 92 L43 88 L47 73Z" fill="${C}" ${S}/><path d="M38 67 L50 70 L62 67" fill="none" ${S}/>`;
+      else s += `<path d="M34 68 Q50 76 66 68" fill="none" stroke="${C}" stroke-width="4"/><circle cx="50" cy="76" r="3.5" fill="#ffd34d" ${S}/>`;
+      const eyeY = 48, dx = m === 'sus' ? 2.5 : 0;
+      if (m === 'happy') s += `<path d="M34 ${eyeY} q5 -6 10 0 M56 ${eyeY} q5 -6 10 0" ${S} fill="none"/>`;
+      else {
+        const ry = m === 'sus' ? 4 : m === 'shock' ? 8 : 7;
+        s += `<ellipse cx="39" cy="${eyeY}" rx="6.5" ry="${ry}" fill="#fff" ${S}/><ellipse cx="61" cy="${eyeY}" rx="6.5" ry="${ry}" fill="#fff" ${S}/>`;
+        s += `<circle cx="${40 + dx}" cy="${eyeY + 1}" r="2.6" fill="#1b1b1b"/><circle cx="${62 + dx}" cy="${eyeY + 1}" r="2.6" fill="#1b1b1b"/>`;
+        if (m === 'sus') s += `<path d="M31 ${eyeY - 3} h16 M53 ${eyeY - 3} h16" ${S}/>`;
+      }
+      if (m === 'angry') s += `<path d="M31 ${eyeY - 10} l14 5 M69 ${eyeY - 10} l-14 5" ${S}/>`;
+      if (acc === 'sourcils' && m !== 'angry') s += `<path d="M31 ${eyeY - 11} q7 -4 14 0 M55 ${eyeY - 11} q7 -4 14 0" stroke="#1b1b1b" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+      s += `<ellipse cx="50" cy="58" rx="8" ry="6.5" fill="${this.shade(B, -22)}" ${S}/><ellipse cx="47.5" cy="56" rx="2.2" ry="1.5" fill="rgba(255,255,255,.6)"/>`;
+      s += `<ellipse cx="32" cy="62" rx="4" ry="2.6" fill="#ff8fa3" opacity=".55"/><ellipse cx="68" cy="62" rx="4" ry="2.6" fill="#ff8fa3" opacity=".55"/>`;
+      const M = { neutral: 'M43 67 q7 4 14 0', happy: 'M40 65 q10 10 20 0 q-10 4 -20 0z', sus: 'M43 68 h12', angry: 'M42 70 q8 -6 16 0', sad: 'M42 70 q8 -6 16 0', shock: 'M46 66 a4 5 0 1 0 8 0 a4 5 0 1 0 -8 0' }[m] || 'M43 67 q7 4 14 0';
+      s += `<path d="${M}" ${S} fill="${m === 'happy' || m === 'shock' ? '#7a2a1a' : 'none'}"/>`;
+      if (acc === 'moustache') s += `<path d="M38 64 q6 -5 12 -1 q6 -4 12 1 q-6 5 -12 1 q-6 4 -12 -1z" fill="#6b4a2b" ${S}/>`;
+      if (acc === 'lunettes') s += `<circle cx="39" cy="${eyeY}" r="9" fill="none" ${S}/><circle cx="61" cy="${eyeY}" r="9" fill="none" ${S}/><path d="M48 ${eyeY} h4" ${S}/>`;
+      if (acc === 'monocle') s += `<circle cx="61" cy="${eyeY}" r="9.5" fill="rgba(255,255,255,.15)" ${S}/><path d="M70 ${eyeY + 2} q4 10 -2 22" fill="none" stroke="#d99a2b" stroke-width="2"/>`;
+      if (acc === 'taches') s += `<g fill="${this.shade(B, -35)}"><circle cx="33" cy="58" r="1.4"/><circle cx="36" cy="61" r="1.4"/><circle cx="31" cy="62" r="1.2"/><circle cx="67" cy="58" r="1.4"/><circle cx="64" cy="61" r="1.4"/><circle cx="69" cy="62" r="1.2"/></g>`;
+      if (acc === 'barbe') s += `<path d="M30 66 Q50 92 70 66 Q62 76 50 76 Q38 76 30 66Z" fill="#6b4a2b" ${S}/>`;
+      if (acc === 'boucle') s += `<circle cx="18" cy="60" r="3.5" fill="#ffd34d" ${S}/>`;
+      s += this.hat(hat, HC, S);
+      return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+    },
+
+    hat(hat, HC, S) {
+      switch (hat) {
+        case 'paille': return `<ellipse cx="50" cy="31" rx="36" ry="8" fill="#f2cf63" ${S}/><path d="M32 31 Q33 12 50 12 Q67 12 68 31Z" fill="#f2cf63" ${S}/><path d="M33 26 Q50 30 67 26" stroke="${HC}" stroke-width="4" fill="none"/><circle cx="62" cy="24" r="4" fill="#e57f9c" ${S}/><circle cx="62" cy="24" r="1.4" fill="#ffd34d"/><circle cx="55" cy="26" r="3" fill="#fff" stroke="#1b1b1b" stroke-width="2"/>`;
+        case 'beret': return `<path d="M27 32 Q30 14 52 15 Q76 17 72 32 Q50 26 27 32Z" fill="${HC}" ${S}/><path d="M52 15 l2 -5" ${S}/>`;
+        case 'bandana': return `<path d="M22 36 Q24 16 50 15 Q76 16 78 36 Q50 28 22 36Z" fill="${HC}" ${S}/><path d="M76 33 l10 6 l-4 -10z" fill="${HC}" ${S}/><g fill="#fff"><circle cx="40" cy="25" r="1.8"/><circle cx="52" cy="22" r="1.8"/><circle cx="62" cy="26" r="1.8"/></g>`;
+        case 'casquette': return `<path d="M26 34 Q28 14 50 14 Q72 14 74 34Z" fill="${HC}" ${S}/><path d="M60 33 Q82 30 90 36 Q76 40 60 37Z" fill="${HC}" ${S}/><circle cx="50" cy="15" r="2.5" fill="#fff" ${S}/>`;
+        case 'haut': return `<ellipse cx="50" cy="31" rx="27" ry="6" fill="#1b1b1b" ${S}/><path d="M36 31 L37 4 L63 4 L64 31Z" fill="#1b1b1b" ${S}/><path d="M37 24 h26" stroke="${HC}" stroke-width="4"/>`;
+        case 'fleurs': return `<path d="M24 34 Q50 22 76 34" stroke="#3f8f3a" stroke-width="4" fill="none"/>${[26, 38, 50, 62, 74].map((x, i) => `<circle cx="${x}" cy="${32 - (i % 2 ? 4 : 0) - (i === 2 ? 4 : 0)}" r="4.5" fill="${['#e57f9c', '#ffd34d', '#fff', '#9b6fc4', '#f08a3e'][i]}" ${S}/>`).join('')}`;
+        case 'bob': return `<path d="M24 36 Q26 30 32 30 Q34 14 50 14 Q66 14 68 30 Q74 30 76 36 Q50 32 24 36Z" fill="${HC}" ${S}/>`;
+        case 'plume': return `<path d="M30 33 Q32 18 50 17 Q68 18 70 33Z" fill="#6b4a2b" ${S}/><path d="M64 22 Q80 2 86 6 Q78 14 66 26" fill="${HC}" ${S}/>`;
+        case 'chignon': return `<path d="M24 40 Q22 20 50 18 Q78 20 76 40 Q66 26 50 27 Q34 26 24 40Z" fill="#6b4a2b" ${S}/><circle cx="50" cy="14" r="8" fill="#6b4a2b" ${S}/>`;
+        case 'bonnet': return `<path d="M26 35 Q26 12 50 12 Q74 12 74 35Z" fill="${HC}" ${S}/><path d="M25 35 h50" stroke="#fff" stroke-width="6"/><circle cx="50" cy="10" r="5" fill="#fff" ${S}/>`;
+        case 'couronne': return `<path d="M30 32 L32 14 L41 24 L50 10 L59 24 L68 14 L70 32Z" fill="#ffd34d" ${S}/><circle cx="50" cy="26" r="2.5" fill="#b8452f"/>`;
+        default: return `<path d="M30 30 Q36 20 44 26 Q50 16 58 25 Q66 20 70 30" fill="none" ${S}/>`;
+      }
+    },
+
+    shade(hex, amt) {
+      const n = parseInt(hex.slice(1), 16);
+      const r = clamp((n >> 16) + amt, 0, 255), gg = clamp(((n >> 8) & 255) + amt, 0, 255), b = clamp((n & 255) + amt, 0, 255);
+      return '#' + ((r << 16) | (gg << 8) | b).toString(16).padStart(6, '0');
+    }
+  };
+
+  CBB.Avatar = Avatar;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* Coup Bas en Bourse — sauvegarde locale (localStorage, avec repli en mémoire). */
+(function (g) {
+  'use strict';
+  const CBB = g.CBB = g.CBB || {};
+  const KEY = 'cbb.save.v1', SKEY = 'cbb.settings.v1', NKEY = 'cbb.notes.v1';
+  const mem = {};
+  function get(k) { try { const v = localStorage.getItem(k); return v === null ? (mem[k] || null) : v; } catch (e) { return mem[k] || null; } }
+  function set(k, v) { mem[k] = v; try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+  function del(k) { delete mem[k]; try { localStorage.removeItem(k); } catch (e) { /* ignore */ } }
+  function parse(v) { try { return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+
+  CBB.storage = {
+    saveGame: s => set(KEY, JSON.stringify(s)),
+    loadGame: () => parse(get(KEY)),
+    clearGame: () => del(KEY),
+    loadSettings: () => parse(get(SKEY)),
+    saveSettings: s => set(SKEY, JSON.stringify(s)),
+    loadNotes: seed => { const all = parse(get(NKEY)) || {}; return all[seed] || {}; },
+    saveNotes: (seed, notes) => { const all = parse(get(NKEY)) || {}; all[seed] = notes; const keys = Object.keys(all); if (keys.length > 10) delete all[keys[0]]; set(NKEY, JSON.stringify(all)); }
+  };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* Coup Bas en Bourse — graphiques Canvas/SVG sans bibliothèque externe. */
+(function (g) {
+  'use strict';
+  const CBB = g.CBB = g.CBB || {};
+
+  function niceStep(range, ticks) {
+    const raw = range / ticks, mag = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / mag;
+    return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * mag;
+  }
+
+  /* series : [{values:[...], color, width, label}] ; opts : {xMax, hover, yFmt} */
+  function lineChart(canvas, series, opts) {
+    const o = opts || {};
+    const dpr = g.devicePixelRatio || 1;
+    const w = canvas.clientWidth || 320, h = canvas.clientHeight || 220;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    const pad = { l: 46, r: 10, t: 10, b: 22 };
+    const pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    const xMax = o.xMax || 24;
+    let lo = Infinity, hi = -Infinity;
+    series.forEach(s => s.values.forEach(v => { lo = Math.min(lo, v); hi = Math.max(hi, v); }));
+    if (!isFinite(lo)) { lo = 900; hi = 1100; }
+    const minR = Math.max(50, Math.abs(hi) * 0.04); if (hi - lo < minR) { const m = (hi + lo) / 2; lo = m - minR / 2; hi = m + minR / 2; }
+    const step = niceStep(hi - lo, 4);
+    lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+    if (o.minY !== undefined && lo < o.minY) lo = o.minY;
+    const X = i => pad.l + (i / xMax) * pw;
+    const Y = v => pad.t + ph - ((v - lo) / (hi - lo)) * ph;
+    ctx.font = 'bold 11px "Trebuchet MS", sans-serif';
+    ctx.strokeStyle = 'rgba(0,0,0,0.10)'; ctx.fillStyle = 'rgba(27,27,27,0.75)'; ctx.lineWidth = 1;
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for (let v = lo; v <= hi + 1e-9; v += step) {
+      ctx.beginPath(); ctx.moveTo(pad.l, Y(v)); ctx.lineTo(w - pad.r, Y(v)); ctx.stroke();
+      ctx.fillText((o.yFmt || (x => Math.round(x)))(v), pad.l - 6, Y(v));
+    }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (let i = 0; i <= xMax; i += 4) ctx.fillText(String(i), X(i), h - pad.b + 6);
+    if (o.base !== undefined && o.base >= lo && o.base <= hi) {
+      ctx.setLineDash([5, 4]); ctx.strokeStyle = 'rgba(184,69,47,0.55)';
+      ctx.beginPath(); ctx.moveTo(pad.l, Y(o.base)); ctx.lineTo(w - pad.r, Y(o.base)); ctx.stroke(); ctx.setLineDash([]);
+    }
+    series.forEach(s => {
+      if (!s.values.length) return;
+      const path = () => { ctx.beginPath(); s.values.forEach((v, i) => (i ? ctx.lineTo(X(i), Y(v)) : ctx.moveTo(X(i), Y(v)))); };
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.strokeStyle = '#1b1b1b'; ctx.lineWidth = (s.width || 2) + 2.5; path(); ctx.stroke();
+      ctx.strokeStyle = s.color; ctx.lineWidth = s.width || 2; path(); ctx.stroke();
+      const li = s.values.length - 1;
+      ctx.fillStyle = s.color; ctx.strokeStyle = '#1b1b1b'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(X(li), Y(s.values[li]), 3.5, 0, 7); ctx.fill(); ctx.stroke();
+    });
+    if (o.hover !== null && o.hover !== undefined) {
+      ctx.strokeStyle = 'rgba(27,27,27,0.5)';
+      ctx.beginPath(); ctx.moveTo(X(o.hover), pad.t); ctx.lineTo(X(o.hover), pad.t + ph); ctx.stroke();
+      series.forEach(s => { if (s.values[o.hover] === undefined) return; ctx.fillStyle = s.color; ctx.strokeStyle = '#1b1b1b'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(X(o.hover), Y(s.values[o.hover]), 4.5, 0, 7); ctx.fill(); ctx.stroke(); });
+    }
+    return { indexAt: px => Math.max(0, Math.min(xMax, Math.round(((px - pad.l) / pw) * xMax))) };
+  }
+
+  function sparkline(values, color, w, h) {
+    w = w || 96; h = h || 30;
+    if (values.length < 2) return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><line x1="0" y1="${h / 2}" x2="${w}" y2="${h / 2}" stroke="#1b1b1b" stroke-opacity=".35" stroke-dasharray="3 3"/></svg>`;
+    const lo = Math.min.apply(null, values), hi = Math.max.apply(null, values), rg = hi - lo || 1;
+    const pts = values.map((v, i) => `${(i / (values.length - 1) * (w - 4) + 2).toFixed(1)},${(h - 3 - (v - lo) / rg * (h - 6)).toFixed(1)}`).join(' ');
+    return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="#1b1b1b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+  }
+
+  CBB.charts = { lineChart, sparkline };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* Coup Bas en Bourse — interface (mode solo). L'interface lit uniquement publicView(),
+   exactement comme le fera un client multijoueur. */
+(function () {
+  'use strict';
+  const CO = CBB.COMPANIES, CF = CBB.CONFIG, M = CBB.market, ST = CBB.storage;
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const eur = n => Math.round(n).toLocaleString('fr-FR') + ' €';
+  const pct = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1).replace('.', ',') + ' %';
+  const cls = v => (v > 0.0001 ? 'up' : v < -0.0001 ? 'down' : '');
+  const zeros = () => new Array(8).fill(0);
+  const HUMAN = 'H1';
+  const AV = CBB.Avatar;
+  const avh = (av, mood, cls) => AV.html(av, mood, cls);
+  const moodOf = g => (g > 8 ? 'happy' : g < -8 ? 'sad' : g < -2 ? 'sus' : 'neutral');
+
+  let S = null, tab = 'market', timer = null, deadline = 0, nonce = 0, unread = 0, seenChat = 0;
+  let chartSel = new Set([0, 1, 2, 3, 4, 5, 6, 7]), chartHover = null, notes = {}, overviewOpen = true, chartMode = 'price', shSel = null;
+  const settings = Object.assign({ anim: true, name: 'Trader', av: null }, ST.loadSettings() || {});
+  if (!settings.av || typeof settings.av !== 'object') settings.av = AV.random();
+
+  /* ---------- utilitaires ---------- */
+  function show(id) { $$('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + id)); window.scrollTo(0, 0); }
+  function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2400); }
+  function openModal(html, opts) {
+    const b = $('#modal-body'); b.innerHTML = html; b.dataset.locked = opts && opts.locked ? '1' : '';
+    $('#modal').classList.remove('hidden'); b.scrollTop = 0;
+  }
+  function closeModal() { $('#modal').classList.add('hidden'); }
+  $('#modal').addEventListener('click', e => { if (e.target.id === 'modal' && !$('#modal-body').dataset.locked) closeModal(); });
+  function view() { return M.publicView(S, HUMAN); }
+  function save() { if (S) ST.saveGame(S); }
+  function applySettings() { document.body.classList.toggle('noanim', !settings.anim); }
+
+  /* ---------- menu ---------- */
+  function refreshMenu() {
+    const cast = CBB.ai.PROFILES.slice(0, 3).map(p => p.av).concat([settings.av]).concat(CBB.ai.PROFILES.slice(3, 6).map(p => p.av));
+    $('#hero-cast').innerHTML = cast.map((a, i) => avh(a, i === 3 ? 'happy' : ['neutral', 'sus', 'happy', 'shock'][i % 4])).join('');
+    const g = ST.loadGame();
+    $('#m-resume').hidden = !(g && g.phase === 'trading');
+  }
+  $('#m-solo').onclick = () => openSetup();
+  $('#m-resume').onclick = () => { const g = ST.loadGame(); if (g) { S = g; enterGame(); } };
+  $$('.soon').forEach(b => { b.onclick = () => openModal(`<h2>${esc(b.dataset.soon)}</h2>
+    <p>Le multijoueur en ligne arrive aux prochaines étapes : salons publics et privés avec code d'invitation (étape 3), puis synchronisation en temps réel via Supabase (étape 4).</p>
+    <p>Le moteur de cette v1 a été écrit pour tourner tel quel côté serveur, donc les règles et les calculs seront identiques.</p>
+    <p class="muted">Pour l'instant, seul le mode solo est jouable.</p>
+    <div class="actions"><button class="btn gold" data-close>Compris</button></div>`); });
+  $('#m-rules').onclick = () => openRules();
+  $('#m-tuto').onclick = () => openTuto(0);
+  $('#m-settings').onclick = () => openSettings();
+  $$('[data-back]').forEach(b => { b.onclick = () => { show(b.dataset.back); refreshMenu(); }; });
+  document.addEventListener('click', e => { if (e.target.closest('[data-close]')) closeModal(); });
+
+  /* ---------- configuration solo ---------- */
+  let setupAv = Object.assign({}, settings.av);
+  const AVK = { body: 'BODY', hat: 'HATS', outfit: 'OUTFITS', acc: 'ACCS', cloth: 'CLOTH' };
+  function drawSetupAv(mood) { $('#s-av-preview').innerHTML = avh(setupAv, mood || 'happy'); }
+  $$('[data-avk]').forEach(b => { b.onclick = () => {
+    const k = b.dataset.avk;
+    if (k === 'random') setupAv = AV.random();
+    else { setupAv[k] = ((setupAv[k] || 0) + 1) % AV[AVK[k]].length; if (k === 'cloth') setupAv.hatC = ((setupAv.hatC || 0) + 3) % AV.CLOTH.length; }
+    drawSetupAv(['happy', 'neutral', 'sus', 'shock'][Math.floor(Math.random() * 4)]);
+  }; });
+  function openSetup() {
+    $('#s-name').value = settings.name;
+    setupAv = Object.assign({}, settings.av); drawSetupAv();
+    updDiff(); show('setup');
+  }
+  function updDiff() {
+    const v = +$('#s-rules').value;
+    $('#s-rules-val').textContent = v;
+    $('#s-diff').innerHTML = `<span>${v * 8} règles au total</span><b class="gold-t">${CBB.DIFFICULTY[v]}</b>`;
+  }
+  $('#s-rules').oninput = updDiff;
+  $('#s-start').onclick = () => {
+    settings.name = ($('#s-name').value || 'Trader').trim().slice(0, 18) || 'Trader';
+    settings.av = setupAv; ST.saveSettings(settings);
+    startGame({ rulesPerCompany: +$('#s-rules').value, roundSeconds: +$('#s-time').value, seed: $('#s-seed').value.trim() || null });
+  };
+  function startGame(c) {
+    S = M.createGame({ seed: c.seed || undefined, rulesPerCompany: c.rulesPerCompany, roundSeconds: c.roundSeconds,
+      humans: [{ id: HUMAN, name: settings.name, av: settings.av }], fillAI: true });
+    tab = 'market'; unread = 0; seenChat = 0;
+    S.chat.push({ round: 1, from: 'SYS', name: 'Marché', av: '📣', isAI: false, sys: true, text: 'La séance est ouverte ! Les règles secrètes du marché viennent d\'être tirées au sort. À vous de les percer à jour…', ts: Date.now() });
+    save(); enterGame();
+  }
+
+  /* ---------- jeu ---------- */
+  function enterGame() {
+    notes = ST.loadNotes(S.seed);
+    seenChat = S.chat.length;
+    if (S.phase === 'ended') { renderEnd(); show('end'); return; }
+    show('game'); selectTab(tab); startTimer();
+  }
+  $$('#tabs button').forEach(b => { b.onclick = () => selectTab(b.dataset.tab); });
+  function selectTab(t) {
+    tab = t;
+    $$('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+    if (t === 'chat') { unread = 0; seenChat = S.chat.length; }
+    renderAll(); window.scrollTo(0, 0);
+  }
+  function renderAll() {
+    const v = view();
+    renderDash(v);
+    const body = $('#tab-body');
+    if (tab === 'market') body.innerHTML = renderMarket(v);
+    else if (tab === 'portfolio') body.innerHTML = renderPortfolio(v);
+    else if (tab === 'inquiry') body.innerHTML = renderInquiry(v);
+    else if (tab === 'ranking') body.innerHTML = renderRanking(v);
+    else if (tab === 'charts') { body.innerHTML = renderChartsTab(v); drawCharts(v); }
+    else if (tab === 'chat') body.innerHTML = renderChat(v);
+    bindTab(v);
+    renderOrderSummary(v);
+    const badge = $('#chat-badge');
+    badge.hidden = !unread; badge.textContent = unread > 9 ? '9+' : unread;
+    tick();
+  }
+
+  function renderDash(v) {
+    const me = v.me, port = me.wealth - me.cash, rk = v.players.find(p => p.id === HUMAN).rank;
+    const gain = (me.wealth - CF.START_CASH) / CF.START_CASH * 100;
+    $('#dash').innerHTML = `<div class="dash-top">
+      <button class="icon-btn" id="btn-menu" aria-label="Menu">☰</button>
+      <div class="round">Manche <b>${v.round}</b>/${CF.ROUNDS}</div>
+      <div class="timer" id="timer">${S.config.roundSeconds ? '' : '∞'}</div>
+      <div class="rank">#${rk}<small>/${v.players.length}</small></div></div>
+      <div class="round-bar"><i style="width:${(v.round - 1) / CF.ROUNDS * 100}%"></i></div>
+      <div class="dash-stats">
+        <div><small>Liquidités</small><b>${eur(me.cash)}</b></div>
+        <div><small>Portefeuille</small><b>${eur(port)}</b></div>
+        <div><small>Patrimoine <span class="${cls(gain)}">${pct(gain)}</span></small><b class="gold">${eur(me.wealth)}</b></div>
+      </div>`;
+    $('#btn-menu').onclick = openGameMenu;
+  }
+
+  function myOrder() { const o = S.orders[HUMAN]; return o ? { buy: o.buy.slice(), sell: o.sell.slice() } : { buy: zeros(), sell: zeros() }; }
+  function projected(v, o, except) {
+    let cash = v.me.cash;
+    for (let c = 0; c < 8; c++) if (c !== except) cash += (o.sell[c] - o.buy[c]) * v.prices[c];
+    return cash;
+  }
+  function setOrder(o) {
+    const res = M.submitOrder(S, HUMAN, o, 'h' + (++nonce) + '-' + Date.now());
+    if (!res.ok) { toast(res.error); return false; }
+    save(); renderAll(); return true;
+  }
+  function renderOrderSummary(v) {
+    const o = myOrder();
+    const items = [];
+    CO.forEach((co, c) => {
+      if (o.buy[c]) items.push(`<span class="up">+${o.buy[c]} ${co.icon}</span>`);
+      if (o.sell[c]) items.push(`<span class="down">−${o.sell[c]} ${co.icon}</span>`);
+    });
+    $('#order-summary').innerHTML = items.length
+      ? `Ordres : ${items.join(' ')}<br>Liquidités après : <b>${eur(projected(v, o, -1))}</b>`
+      : 'Aucun ordre : tu conserves tes positions.';
+  }
+
+  /* --- Marché --- */
+  /* Répartition des 100 actions : moi / autres traders / disponibles */
+  function ownership(v, c) {
+    const last = v.log[v.log.length - 1];
+    const held = CF.SHARES - v.stock[c], mine = v.me.holdings[c];
+    return { held, mine, others: held - mine, free: v.stock[c], holders: last ? last.holders[c] : 0, maxHold: last ? last.maxHold[c] : 0 };
+  }
+  function ownBar(v, c) {
+    const w = ownership(v, c);
+    return `<div class="own"><div class="own-top"><span>Détenues par les traders : <b>${w.held}</b>/100</span><span>👥 <b>${w.holders}</b> actionnaire${w.holders > 1 ? 's' : ''}</span></div>
+      <div class="own-bar"><i class="me" style="width:${w.mine}%"></i><i class="oth" style="width:${w.others}%"></i></div>
+      <div class="own-leg"><span><b class="dot me"></b>Moi ${w.mine}</span><span><b class="dot oth"></b>Autres ${w.others}</span><span><b class="dot free"></b>Disponibles ${w.free}</span><span>Plus grosse position : ${w.maxHold}</span></div></div>`;
+  }
+  function renderOverview(v) {
+    const tot = CO.reduce((a, co, c) => a + CF.SHARES - v.stock[c], 0);
+    return `<details class="card overview" ${overviewOpen ? 'open' : ''} id="overview"><summary>📦 Actions détenues par tous les traders <b>${tot}</b>/800</summary>
+      <table class="tbl"><tr><th>Entreprise</th><th class="r">Détenues</th><th class="r">👥</th><th class="r">Max</th><th class="r">Moi</th></tr>
+      ${CO.map((co, c) => { const w = ownership(v, c); return `<tr><td>${co.icon} ${co.name}</td><td class="r"><span class="mini-bar"><i style="width:${w.held}%;background:${co.color}"></i></span>${w.held}</td><td class="r">${w.holders}</td><td class="r">${w.maxHold}</td><td class="r">${w.mine || '–'}</td></tr>`; }).join('')}
+      </table><p class="muted" style="font-size:11.5px;margin:6px 0 0">👥 = nombre de traders qui possèdent au moins une action · Max = plus grosse position d'un seul trader. Mis à jour à chaque fin de manche.</p></details>`;
+  }
+
+  function renderMarket(v) {
+    const o = myOrder(), last = v.log[v.log.length - 1];
+    return renderOverview(v) + `<div class="cards">${CO.map((co, c) => {
+      const P = v.prices[c], H = v.history, prev = H.length > 1 ? H[H.length - 2][c] : P, d = (P - prev) / prev * 100, held = v.me.holdings[c];
+      const pend = o.buy[c] ? `<span class="pend buy">+${o.buy[c]} à l'achat</span>` : o.sell[c] ? `<span class="pend sell">−${o.sell[c]} à la vente</span>` : '';
+      return `<article class="card co" style="--co:${co.color}">
+        <div class="co-head"><span class="co-icon">${co.icon}</span>
+          <div class="co-name"><b>${co.name}</b><small>${co.sector}</small></div>
+          <div class="co-price"><b>${eur(P)}</b><span class="pill ${cls(d)}">${pct(d)}</span></div></div>
+        <div class="co-mid">${CBB.charts.sparkline(H.map(h => h[c]), co.color)}
+          <div class="co-info"><span>Mes actions : <b>${held}</b>${held ? ` <span class="muted">(${eur(held * P)})</span>` : ''}</span>${pend}</div></div>
+        ${ownBar(v, c)}
+        ${last ? `<div class="co-vol">Manche ${last.round} : ⬆ ${last.buyVol[c]} achetée(s) par ${last.buyers[c]} · ⬇ ${last.sellVol[c]} vendue(s) par ${last.sellers[c]}</div>` : ''}
+        <div class="co-actions"><button class="btn buy" data-trade="buy" data-c="${c}">Acheter</button>
+          <button class="btn sell" data-trade="sell" data-c="${c}" ${held ? '' : 'disabled'}>Vendre</button></div>
+      </article>`;
+    }).join('')}</div>`;
+  }
+
+  function openTrade(c, mode) {
+    const v = view(), co = CO[c], P = v.prices[c], held = v.me.holdings[c];
+    const o = myOrder();
+    let q = mode === 'buy' ? o.buy[c] : o.sell[c];
+    const maxQ = m => m === 'sell' ? held : Math.max(0, Math.min(Math.floor(projected(v, o, c) / P), v.stock[c], CF.SHARES - held));
+    function draw() {
+      const mx = maxQ(mode); q = Math.max(0, Math.min(q, mx));
+      const after = projected(v, o, c) + (mode === 'buy' ? -q * P : q * P);
+      openModal(`<h2>${co.icon} ${co.name} <span class="muted" style="font-size:14px">${eur(P)}</span></h2>
+        <div class="seg"><button class="b ${mode === 'buy' ? 'on' : ''}" data-mode="buy">Acheter</button><button class="s ${mode === 'sell' ? 'on' : ''}" data-mode="sell" ${held ? '' : 'disabled'}>Vendre</button></div>
+        <div class="stepper"><button data-d="-10">−10</button><button data-d="-1">−1</button><input class="qty" id="t-q" inputmode="numeric" value="${q}"><button data-d="1">+1</button><button data-d="10">+10</button></div>
+        <div style="text-align:center;margin-bottom:12px"><button class="btn small ghost" data-max>Max (${mx})</button></div>
+        <div class="trade-sum">
+          <span>${mode === 'buy' ? 'Coût' : 'Produit de la vente'}</span><span class="r">${eur(q * P)}</span>
+          <span>Liquidités après tous tes ordres</span><span class="r ${after < 0 ? 'down' : ''}">${eur(after)}</span>
+          <span>Détenues après</span><span class="r">${held + (mode === 'buy' ? q : -q)}</span>
+        </div>
+        <p class="muted" style="font-size:12px">L'ordre est exécuté au cours actuel quand la manche se clôture. Si plusieurs traders veulent plus d'actions que le stock, il est réparti proportionnellement.</p>
+        <div class="actions"><button class="btn ghost" data-cancel>Retirer l'ordre</button><button class="btn ${mode === 'buy' ? 'buy' : 'sell'}" data-ok>Valider</button></div>`);
+      const b = $('#modal-body');
+      $$('[data-mode]', b).forEach(x => { x.onclick = () => { mode = x.dataset.mode; q = mode === 'buy' ? o.buy[c] : o.sell[c]; draw(); }; });
+      $$('[data-d]', b).forEach(x => { x.onclick = () => { q += +x.dataset.d; draw(); }; });
+      $('[data-max]', b).onclick = () => { q = maxQ(mode); draw(); };
+      $('#t-q').onchange = e => { q = parseInt(e.target.value, 10) || 0; draw(); };
+      $('[data-cancel]', b).onclick = () => { o.buy[c] = 0; o.sell[c] = 0; if (setOrder(o)) closeModal(); };
+      $('[data-ok]', b).onclick = () => {
+        q = parseInt($('#t-q').value, 10) || 0;
+        if (mode === 'buy') { o.buy[c] = q; if (q) o.sell[c] = 0; } else { o.sell[c] = q; if (q) o.buy[c] = 0; }
+        if (setOrder(o)) { closeModal(); toast(q ? `Ordre enregistré : ${mode === 'buy' ? 'achat' : 'vente'} de ${q} ${co.name}` : 'Ordre retiré'); }
+      };
+    }
+    draw();
+  }
+
+  /* --- Portefeuille --- */
+  function renderPortfolio(v) {
+    const me = v.me, rows = CO.map((co, c) => ({ co, c, h: me.holdings[c] })).filter(r => r.h > 0 || me.cost[r.c] > 0);
+    const port = me.wealth - me.cash;
+    let html = `<div class="kpis"><div><small>Liquidités</small><b>${eur(me.cash)}</b></div><div><small>Actions</small><b>${eur(port)}</b></div><div><small>Patrimoine</small><b class="gold">${eur(me.wealth)}</b></div></div>`;
+    if (!rows.length) html += `<div class="card empty">Tu n'as encore aucune action.<br>Va dans l'onglet Marché pour passer tes premiers ordres.</div>`;
+    else {
+      html += `<div class="card"><table class="tbl"><tr><th>Entreprise</th><th class="r">Qté</th><th class="r">Cours</th><th class="r">Valeur</th><th class="r">+/−</th></tr>
+        ${rows.map(r => { const val = r.h * v.prices[r.c], pl = me.proceeds[r.c] + val - me.cost[r.c];
+          return `<tr><td>${r.co.icon} ${r.co.name}</td><td class="r">${r.h}</td><td class="r">${eur(v.prices[r.c])}</td><td class="r">${eur(val)}</td><td class="r ${cls(pl)}">${pl > 0 ? '+' : ''}${eur(pl)}</td></tr>`; }).join('')}
+      </table><p class="muted" style="font-size:12px;margin:8px 0 0">+/− = ventes réalisées + valeur actuelle − achats.</p></div>`;
+    }
+    html += `<div class="section-title" style="margin-top:14px">Évolution de mon patrimoine</div><canvas class="chart" id="pf-chart" style="height:180px"></canvas>`;
+    const o = myOrder();
+    if (o.buy.some(x => x) || o.sell.some(x => x)) html += `<div style="margin-top:12px;text-align:center"><button class="btn ghost" id="clear-orders">Annuler tous mes ordres</button></div>`;
+    return html;
+  }
+
+  /* --- Enquête --- */
+  function maskHtml(t) { return esc(t).replace(/\?+/g, m => `<span class="q">${m}</span>`); }
+  function renderInquiry(v) {
+    const r = v.round, st = CBB.reveal.stageIndex(r), next = CBB.reveal.nextRevealRound(r);
+    const last = v.log[v.log.length - 1];
+    let html = `<div class="inq-head"><div><b>${CBB.reveal.STAGES[st].label}</b><br><span class="muted">${next ? 'Prochaine révélation : manche ' + next : 'Toutes les règles sont dévoilées'}</span></div>
+      <div class="stage-steps">${CBB.reveal.STAGES.map((s, i) => `<i class="${i <= st ? 'on' : ''}"></i>`).join('')}</div></div>`;
+    html += CO.map((co, c) => {
+      const rules = v.rules.filter(x => x.target === c);
+      const ser = v.history.map(h => h[c]);
+      return `<div class="card inq" style="--co:${co.color}"><h3>${co.icon} ${co.name} <span class="muted" style="font-size:13px;font-weight:500">${eur(v.prices[c])}</span></h3>
+        <div class="mini-stats">📦 Détenues par les traders : <b>${CF.SHARES - v.stock[c]}</b>/100 · 👥 ${last ? last.holders[c] : 0} actionnaire(s) · Max ${last ? last.maxHold[c] : 0} · Moi ${v.me.holdings[c]}</div>
+        ${last ? `<div class="mini-stats">Dernières variations : ${ser.slice(-6).map((p, i, a) => i ? `<span class="${cls(p - a[i - 1])}">${pct((p - a[i - 1]) / a[i - 1] * 100)}</span>` : '').filter(Boolean).join(' · ')}</div>` : ''}
+        ${rules.map((x, i) => `<div class="rule"><div class="rule-n"><span>Règle ${i + 1}</span><span>${Math.round(x.ratio * 100)} % visible</span></div>
+          <div class="rule-text">« ${maskHtml(x.text)} »</div><div class="bar"><i style="width:${x.ratio * 100}%"></i></div></div>`).join('')}
+        <textarea data-note="${c}" placeholder="Mes hypothèses sur ${co.name}…">${esc(notes[c] || '')}</textarea></div>`;
+    }).join('');
+    return html;
+  }
+
+  /* --- Classement --- */
+  function rankRows(v, final) {
+    const sorted = v.players.slice().sort((a, b) => a.rank - b.rank || b.wealth - a.wealth);
+    return sorted.map(p => {
+      const rk = p.ranks, prev = rk.length > 1 ? rk[rk.length - 2] : p.rank, mv = prev - p.rank;
+      const g = (p.wealth - CF.START_CASH) / CF.START_CASH * 100;
+      return `<div class="rank-row ${p.id === HUMAN ? 'me' : ''}"><div class="pos">${p.rank}</div>${avh(p.av, moodOf(g))}
+        <div class="who"><b>${esc(p.name)}${p.isAI ? '<span class="tag-ai">IA</span>' : ''}</b><small>${p.isAI ? p.profileLabel : 'Humain'}${!final && mv ? ` · <span class="mv ${mv > 0 ? 'up' : 'down'}">${mv > 0 ? '▲' : '▼'}${Math.abs(mv)}</span>` : ''}</small></div>
+        <div class="w">${eur(p.wealth)}<small class="${cls(g)}">${pct(g)}</small></div></div>`;
+    }).join('');
+  }
+  function renderRanking(v) { return `<div class="section-title">Classement après ${v.log.length} manche(s)</div>${rankRows(v, false)}`; }
+
+  /* --- Graphiques --- */
+  function renderChartsTab(v) {
+    const seg = `<div class="seg">${[['price', '📈 Cours'], ['holders', '🧩 Actionnaires'], ['held', '📦 Détention']].map(([k, l]) => `<button data-cmode="${k}" class="${chartMode === k ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+    if (chartMode === 'holders') return seg + renderShareholders(v);
+    const help = chartMode === 'held' ? 'Nombre d\'actions détenues par l\'ensemble des traders (sur 100), manche par manche. Touche le graphique pour lire une manche.' : 'Touche le graphique pour lire les cours d\'une manche.';
+    return seg + `<div class="chips">${CO.map((co, c) => `<button class="chip ${chartSel.has(c) ? '' : 'off'}" data-chip="${c}"><i style="background:${co.color}"></i>${co.name}</button>`).join('')}
+      <button class="chip" data-chip="all">Tout</button><button class="chip" data-chip="none">Aucun</button></div>
+      <canvas class="chart" id="px-chart"></canvas><div class="readout" id="readout"><span class="muted">${help}</span></div>`;
+  }
+  function chartData(v, c) {
+    return chartMode === 'held' ? [0].concat(v.log.map(e => e.held[c])) : v.history.map(h => h[c]);
+  }
+  function drawCharts(v) {
+    const cv = $('#px-chart'); if (!cv) return;
+    const held = chartMode === 'held';
+    const series = CO.map((co, c) => ({ values: chartData(v, c), color: co.color, width: 2 })).filter((s, c) => chartSel.has(c));
+    const opts = held ? { xMax: CF.ROUNDS, hover: chartHover, minY: 0, yFmt: x => Math.round(x) } : { xMax: CF.ROUNDS, hover: chartHover, base: 1000 };
+    const ch = CBB.charts.lineChart(cv, series, opts);
+    const pick = e => {
+      const rect = cv.getBoundingClientRect();
+      chartHover = Math.min(ch.indexAt(e.clientX - rect.left), v.history.length - 1);
+      opts.hover = chartHover;
+      CBB.charts.lineChart(cv, series, opts);
+      const i = chartHover;
+      $('#readout').innerHTML = `<b>${i === 0 ? 'Départ' : 'Après manche ' + i}</b>` + CO.map((co, c) => {
+        if (!chartSel.has(c)) return '';
+        const d = chartData(v, c);
+        if (held) return `<span><i style="color:${co.color}">●</i> ${co.name} ${d[i]}/100${i ? ` <span class="${cls(d[i] - d[i - 1])}">${d[i] - d[i - 1] > 0 ? '+' : ''}${d[i] - d[i - 1]}</span>` : ''}</span>`;
+        return `<span><i style="color:${co.color}">●</i> ${co.name} ${eur(d[i])}${i ? ` <span class="${cls(d[i] - d[i - 1])}">${pct((d[i] - d[i - 1]) / d[i - 1] * 100)}</span>` : ''}</span>`;
+      }).join('');
+    };
+    cv.onpointerdown = pick; cv.onpointermove = e => { if (e.buttons || e.pointerType === 'mouse') pick(e); };
+  }
+
+  /* --- Graphique des actionnaires : qui possède quoi --- */
+  function donut(parts, total, center) {
+    const R = 70, r = 42, cx = 80, cy = 80;
+    let a0 = -Math.PI / 2, out = '';
+    const pt = (rad, a) => `${(cx + rad * Math.cos(a)).toFixed(2)},${(cy + rad * Math.sin(a)).toFixed(2)}`;
+    parts.forEach(pp => {
+      if (pp.v <= 0) return;
+      const a1 = a0 + (pp.v / total) * Math.PI * 2 - (pp.v >= total ? 0.0001 : 0);
+      const big = a1 - a0 > Math.PI ? 1 : 0;
+      out += `<path d="M${pt(R, a0)} A${R},${R} 0 ${big} 1 ${pt(R, a1)} L${pt(r, a1)} A${r},${r} 0 ${big} 0 ${pt(r, a0)}Z" fill="${pp.color}" stroke="#1b1b1b" stroke-width="2"/>`;
+      a0 = a1;
+    });
+    return `<svg viewBox="0 0 160 160" width="190" height="190">${out}<circle cx="80" cy="80" r="${r}" fill="#fff6dc" stroke="#1b1b1b" stroke-width="2.5"/>
+      <text x="80" y="78" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="20">${center[0]}</text><text x="80" y="96" text-anchor="middle" font-size="10" font-weight="700">${center[1]}</text></svg>`;
+  }
+  function renderShareholders(v) {
+    const PC = CBB.PLAYER_COLORS;
+    const players = v.players.slice().sort((a, b) => a.seat - b.seat);
+    const tot = p => p.holdings.reduce((a, b) => a + b, 0);
+    const heldAll = players.reduce((a, p) => a + tot(p), 0);
+    const parts = players.map(p => ({ v: tot(p), color: PC[p.seat] })).concat([{ v: 800 - heldAll, color: '#ead7a8' }]);
+    let html = `<div class="card"><div class="section-title" style="margin-top:0">Qui possède le marché ?</div>
+      <div class="pie-wrap">${donut(parts, 800, [heldAll, 'actions / 800'])}</div>
+      <p class="muted small" style="font-size:12px;margin:0;text-align:center">Part de chaque trader dans les 800 actions des 8 entreprises (en beige : actions encore disponibles).</p></div>`;
+    html += `<div class="card" style="margin-top:14px"><div class="section-title" style="margin-top:0">Actionnaires par entreprise</div>
+      ${CO.map((co, c) => {
+        const holders = players.filter(p => p.holdings[c] > 0);
+        const sum = holders.reduce((a, p) => a + p.holdings[c], 0);
+        return `<div class="sh-row ${shSel === c ? 'sel' : ''}" data-shrow="${c}"><span class="nm">${co.icon} ${co.name}</span>
+          <div class="sh-bar">${holders.map(p => `<i class="${p.id === HUMAN ? 'me' : ''}" style="width:${p.holdings[c]}%;background:${PC[p.seat]}" title="${esc(p.name)} : ${p.holdings[c]}">${p.holdings[c] >= 5 ? `<b>${p.holdings[c]}</b>` : ''}</i>`).join('')}</div>
+          <span class="tot">${sum}</span></div>`;
+      }).join('')}
+      <div class="sh-legend">${players.map(p => `<div><i class="dot" style="background:${PC[p.seat]}"></i>${avh(p.av, 'neutral')}<span class="nm">${esc(p.name)}${p.id === HUMAN ? ' (toi)' : ''}</span><b style="margin-left:auto">${tot(p)}</b></div>`).join('')}</div>
+      <p class="muted" style="font-size:12px;margin:10px 0 0">Touche une entreprise pour voir le détail de ses actionnaires. Les portefeuilles sont mis à jour à chaque fin de manche.</p></div>`;
+    if (shSel !== null) {
+      const co = CO[shSel], c = shSel;
+      const holders = players.filter(p => p.holdings[c] > 0).sort((a, b) => b.holdings[c] - a.holdings[c]);
+      html += `<div class="card sh-detail"><div class="section-title" style="margin-top:0">${co.icon} ${co.name} · ${holders.length} actionnaire(s)</div>
+        ${holders.length ? holders.map(p => `<div class="holder"><i class="dot" style="background:${PC[p.seat]}"></i>${avh(p.av, p.holdings[c] >= 10 ? 'happy' : 'neutral')}<span>${esc(p.name)}${p.isAI ? '<span class="tag-ai">IA</span>' : ''}</span><span class="q">${p.holdings[c]} action(s) · ${eur(p.holdings[c] * v.prices[c])}</span></div>`).join('') : '<div class="empty">Personne ne possède encore cette entreprise.</div>'}
+        <div class="holder"><i class="dot free"></i><span>Disponibles sur le marché</span><span class="q">${v.stock[c]}</span></div></div>`;
+    }
+    return html;
+  }
+
+  /* --- Fil (canal général) --- */
+  function renderChat(v) {
+    const msgs = v.chat;
+    return `<div class="chat-channel">💬 Canal général · visible par tous les traders de la partie. Les IA sont marquées <span class="tag-ai">IA</span>.</div>
+      <div class="chat">${msgs.length ? msgs.map(m => `<div class="msg ${m.from === HUMAN ? 'me' : ''} ${m.sys ? 'sys' : ''}">${avh(m.av || m.avatar, m.isAI ? 'neutral' : 'happy')}<div class="bubble">
+        <div class="meta">${esc(m.name)}${m.isAI ? '<span class="tag-ai">IA</span>' : ''} · manche ${m.round}</div>${esc(m.text)}</div></div>`).join('') : '<div class="empty">Aucun message pour l\'instant.</div>'}</div>
+      <form class="chat-input" id="chat-form"><input id="chat-in" maxlength="200" placeholder="Partage une hypothèse… ou un coup bas" autocomplete="off"><button class="btn gold">Envoyer</button></form>`;
+  }
+  let lastSent = 0;
+  function sendChat(text) {
+    text = text.trim(); if (!text) return;
+    if (Date.now() - lastSent < 2000) { toast('Doucement : un message toutes les 2 secondes'); return; }
+    lastSent = Date.now();
+    S.chat.push({ round: Math.min(S.round, CF.ROUNDS), from: HUMAN, name: settings.name, av: settings.av, isAI: false, text: text.slice(0, 200), ts: Date.now() });
+    seenChat = S.chat.length; save(); renderAll();
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+
+  function bindTab(v) {
+    $$('[data-trade]').forEach(b => { b.onclick = () => openTrade(+b.dataset.c, b.dataset.trade); });
+    $$('[data-note]').forEach(t => { t.oninput = () => { notes[t.dataset.note] = t.value; ST.saveNotes(S.seed, notes); }; });
+    $$('[data-chip]').forEach(b => { b.onclick = () => {
+      const k = b.dataset.chip;
+      if (k === 'all') chartSel = new Set([0, 1, 2, 3, 4, 5, 6, 7]); else if (k === 'none') chartSel = new Set();
+      else { const c = +k; chartSel.has(c) ? chartSel.delete(c) : chartSel.add(c); }
+      renderAll(); }; });
+    $$('[data-cmode]').forEach(b => { b.onclick = () => { chartMode = b.dataset.cmode; chartHover = null; renderAll(); }; });
+    $$('[data-shrow]').forEach(b => { b.onclick = () => { const c = +b.dataset.shrow; shSel = shSel === c ? null : c; renderAll(); }; });
+    const ov = $('#overview'); if (ov) ov.ontoggle = () => { overviewOpen = ov.open; };
+    const f = $('#chat-form'); if (f) f.onsubmit = e => { e.preventDefault(); sendChat($('#chat-in').value); };
+    const pf = $('#pf-chart');
+    if (pf) CBB.charts.lineChart(pf, [{ values: v.players.find(p => p.id === HUMAN).wealthHistory, color: '#d99a2b', width: 2.5 }], { xMax: CF.ROUNDS, base: CF.START_CASH });
+    const clr = $('#clear-orders'); if (clr) clr.onclick = () => { setOrder({ buy: zeros(), sell: zeros() }); toast('Ordres annulés'); };
+  }
+
+  /* ---------- chronomètre et fin de tour ---------- */
+  function startTimer() {
+    stopTimer();
+    if (!S || !S.config.roundSeconds || S.phase !== 'trading') return;
+    deadline = Date.now() + S.config.roundSeconds * 1000;
+    timer = setInterval(tick, 250); tick();
+  }
+  function stopTimer() { if (timer) clearInterval(timer); timer = null; }
+  function tick() {
+    if (!timer) return;
+    const left = Math.max(0, Math.ceil((deadline - Date.now()) / 1000)), el = $('#timer');
+    if (el) { el.textContent = '⏱ ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0'); el.classList.toggle('urgent', left <= 10); }
+    if (left <= 0) { stopTimer(); closeModal(); toast('Temps écoulé : ordres envoyés'); endTurn(); }
+  }
+  $('#btn-end').onclick = () => endTurn();
+
+  function endTurn() {
+    if (!S || S.phase !== 'trading') return;
+    stopTimer();
+    const btn = $('#btn-end'); btn.disabled = true;
+    const prevRank = view().players.find(p => p.id === HUMAN).rank;
+    if (!S.orders[HUMAN]) M.submitOrder(S, HUMAN, { buy: zeros(), sell: zeros() }, 'empty-' + S.round);
+    CBB.ai.playRound(S);
+    M.resolveRound(S);
+    save();
+    if (tab !== 'chat') unread += Math.max(0, S.chat.length - seenChat);
+    seenChat = S.chat.length;
+    btn.disabled = false;
+    renderAll(); showResults(prevRank);
+  }
+
+  function showResults(prevRank) {
+    const v = view(), e = v.log[v.log.length - 1];
+    const me = v.players.find(p => p.id === HUMAN), rk = me.rank, mine = e.mine;
+    const done = [];
+    if (mine) CO.forEach((co, c) => { if (mine.buy[c]) done.push(`+${mine.buy[c]} ${co.name}`); if (mine.sell[c]) done.push(`−${mine.sell[c]} ${co.name}`); });
+    const newReveal = !v.ended && CF.REVEAL_ROUNDS.indexOf(v.round) >= 0;
+    const sorted = CO.map((co, c) => ({ co, c, d: (e.after[c] - e.before[c]) / e.before[c] * 100 }));
+    const myG = (me.wealth - CF.START_CASH) / CF.START_CASH * 100;
+    openModal(`<div style="display:flex;align-items:center;gap:8px">${avh(v.players.find(p => p.id === HUMAN).av, prevRank > rk ? 'happy' : prevRank < rk ? 'sad' : moodOf(myG))}<h2 style="margin:0">Résultats de la manche ${e.round}</h2></div>
+      ${sorted.map((x, i) => `<div class="res-row" style="animation-delay:${i * 40}ms"><span>${x.co.icon}</span><span class="nm">${x.co.name}</span>
+        <span class="px">${eur(e.before[x.c])} → <b>${eur(e.after[x.c])}</b></span><span class="pill ${cls(x.d)}">${pct(x.d)}</span></div>`).join('')}
+      <p style="margin-top:12px">Tes transactions : ${done.length ? done.join(', ') : 'aucune'}<br>
+      Classement : <b class="gold-t">#${rk}</b> ${prevRank !== rk ? `<span class="mv ${prevRank > rk ? 'up' : 'down'}">${prevRank > rk ? '▲' : '▼'}${Math.abs(prevRank - rk)}</span>` : ''} · Patrimoine <b>${eur(me.wealth)}</b></p>
+      ${newReveal ? `<div class="reveal-note">🔓 Nouvelles lettres révélées dans l'Enquête (palier manche ${v.round}) !</div>` : ''}
+      <div class="actions"><button class="btn gold" id="res-next">${v.ended ? '🏁 Voir le classement final' : 'Manche ' + v.round + ' →'}</button></div>`, { locked: true });
+    $('#res-next').onclick = () => {
+      closeModal();
+      if (v.ended) { renderEnd(); show('end'); return; }
+      if (newReveal) selectTab('inquiry');
+      startTimer();
+    };
+  }
+
+  /* ---------- fin de partie ---------- */
+  function renderEnd() {
+    const v = view();
+    const sorted = v.players.slice().sort((a, b) => a.rank - b.rank || b.wealth - a.wealth);
+    const top = [sorted[1], sorted[0], sorted[2]];
+    const me = v.me, meP = v.players.find(p => p.id === HUMAN);
+    const best = CO.map((co, c) => ({ co, c, g: me.proceeds[c] + me.holdings[c] * v.prices[c] - me.cost[c], used: me.cost[c] > 0 }))
+      .filter(x => x.used).sort((a, b) => b.g - a.g);
+    const winner = sorted[0];
+    $('#end-body').innerHTML = `<div class="winner"><div style="font-size:14px" class="muted">Fin de la manche 24</div>
+      <h2>🏆 ${esc(winner.name)} domine le marché !</h2>
+      <p class="muted">${winner.id === HUMAN ? 'Bravo, tu as battu les 11 IA !' : `Tu termines <b class="gold-t">${meP.rank}<sup>e</sup></b> avec ${eur(meP.wealth)}.`}</p></div>
+      <div class="podium">${top.map((p, i) => p ? `<div class="pod p${[2, 1, 3][i]}">${avh(p.av, 'happy')}<div class="nm">${esc(p.name)}</div><div class="w">${eur(p.wealth)}</div><div class="block">${[2, 1, 3][i]}</div></div>` : '<div></div>').join('')}</div>
+      <div class="section-title">Classement complet</div>${rankRows(v, true)}
+      <div class="section-title">Évolution des patrimoines</div><canvas class="chart" id="end-chart"></canvas>
+      <div class="section-title">Mes meilleurs investissements</div>
+      <div class="card">${best.length ? `<table class="tbl">${best.map(x => `<tr><td>${x.co.icon} ${x.co.name}</td><td class="r ${cls(x.g)}">${x.g > 0 ? '+' : ''}${eur(x.g)}</td></tr>`).join('')}</table>` : '<div class="empty">Aucun investissement réalisé.</div>'}</div>
+      <div class="section-title">Les règles secrètes dévoilées</div>
+      ${CO.map((co, c) => `<div class="card inq" style="--co:${co.color}"><h3>${co.icon} ${co.name}</h3>${v.rules.filter(r => r.target === c).map(r => `<div class="rule"><div class="rule-text">« ${esc(r.text)} »</div><div class="rule-n" style="margin:6px 0 0"><span>${CBB.rules.CAT_LABELS[r.known.cat] || ''}</span><span>Déclenchée ${r.triggers} fois</span></div></div>`).join('')}</div>`).join('')}
+      <p class="muted" style="font-size:12px;text-align:center">Graine de la partie : ${esc(v.seed)}</p>
+      <div class="end-actions"><button class="btn gold big" id="e-replay">🔁 Rejouer avec les mêmes participants</button>
+        <button class="btn turq big" id="e-new">✨ Nouvelle partie, nouvelles règles</button>
+        <button class="btn ghost big" id="e-menu">🏠 Retour au menu</button></div>`;
+    setTimeout(() => {
+      const cv = $('#end-chart'); if (!cv) return;
+      const ser = sorted.slice(0, 5).map(p => ({ values: p.wealthHistory, color: CBB.PLAYER_COLORS[p.seat], width: p.id === HUMAN ? 3.5 : 2 }));
+      if (!sorted.slice(0, 5).some(p => p.id === HUMAN)) ser.push({ values: meP.wealthHistory, color: CBB.PLAYER_COLORS[meP.seat], width: 3.5 });
+      CBB.charts.lineChart(cv, ser, { xMax: CF.ROUNDS, base: CF.START_CASH });
+    }, 30);
+    const cfg = S.config;
+    $('#e-replay').onclick = () => startGame({ rulesPerCompany: cfg.rulesPerCompany, roundSeconds: cfg.roundSeconds });
+    $('#e-new').onclick = () => openSetup();
+    $('#e-menu').onclick = () => { show('menu'); refreshMenu(); };
+  }
+
+  /* ---------- menus secondaires ---------- */
+  function openGameMenu() {
+    openModal(`<h2>☰ Menu</h2>
+      <div class="end-actions"><button class="btn big" data-close>▶️ Reprendre</button>
+      <button class="btn ghost big" id="gm-rules">📜 Règles du jeu</button>
+      <button class="btn ghost big" id="gm-tuto">🎓 Tutoriel</button>
+      <button class="btn ghost big" id="gm-quit">🏠 Retour au menu (partie sauvegardée)</button></div>`);
+    $('#gm-rules').onclick = openRules; $('#gm-tuto').onclick = () => openTuto(0);
+    $('#gm-quit').onclick = () => { stopTimer(); save(); closeModal(); show('menu'); refreshMenu(); };
+  }
+  function openRules() {
+    openModal(`<h2>📜 Règles du jeu</h2>
+      <p>12 traders, 8 entreprises fictives, 24 manches. Chacun démarre avec <b>10 000 €</b>, chaque action vaut <b>1 000 €</b> et chaque entreprise a <b>100 actions</b> en circulation.</p>
+      <h3>Le but</h3><p>Avoir le plus gros <b>patrimoine</b> à la fin de la manche 24 : argent disponible + valeur de tes actions.</p>
+      <h3>Les règles secrètes</h3><p>Au début de chaque partie, le marché tire au sort des règles cachées (1 à 5 par entreprise). <b>Seules ces règles font bouger les cours</b> : aucun hasard ensuite. Elles peuvent dépendre des autres entreprises, des achats, des ventes, du nombre d'actionnaires, du niveau des cours, de l'historique ou du numéro de la manche.</p>
+      <h3>L'Enquête</h3><p>Les règles sont affichées masquées par des « ? ». Elles se dévoilent aux manches <b>5, 10, 15 et 20</b> (environ 25 %, 50 %, 75 % puis 100 %). Les chiffres sortent en dernier.</p>
+      <h3>Une manche</h3><ol><li>Observe les cours, les volumes et l'Enquête.</li><li>Prépare tes ordres d'achat et de vente.</li><li>Clique sur « Terminer mon tour ».</li><li>Tous les ordres sont exécutés au cours affiché, puis les règles sont évaluées et les nouveaux cours appliqués.</li></ol>
+      <h3>Précisions</h3><ul><li>Variation plafonnée à ±10 % par entreprise et par manche.</li><li>Pas de crédit, pas de vente à découvert, pas de frais.</li><li>Les règles « à la manche précédente » regardent la variation déjà publiée ; les règles d'achat et de vente regardent les ordres exécutés pendant la manche ; les règles de détention regardent les portefeuilles après transactions.</li><li>Si la demande dépasse le stock, les actions sont réparties proportionnellement.</li></ul>
+      <div class="actions"><button class="btn gold" data-close>Fermer</button></div>`);
+  }
+  const TUTO = [
+    ['🎯 Ton objectif', 'Finir la manche 24 avec le plus gros patrimoine des 12 traders. Ton patrimoine = tes liquidités + la valeur de tes actions.'],
+    ['📈 Le marché', 'Dans l\'onglet Marché, touche « Acheter » ou « Vendre » sur une entreprise. Ton ordre reste en attente jusqu\'à la fin de la manche, tu peux le modifier autant que tu veux.'],
+    ['🔍 L\'Enquête', 'Chaque entreprise obéit à des règles secrètes, masquées par des « ? ». Des lettres se dévoilent aux manches 5, 10, 15 et 20. Note tes hypothèses dans les champs prévus.'],
+    ['🧠 Déduire', 'Les cours ne bougent QUE selon les règles. Observe les variations, les volumes d\'achat et de vente, le nombre d\'actionnaires : chaque mouvement est un indice.'],
+    ['🗡️ Les coups bas', 'Certaines règles se déclenchent avec les achats ou les ventes. Bien joué, tu peux faire monter tes actions… ou couler celles de tes rivaux.'],
+    ['✅ Terminer', 'Quand tes ordres sont prêts, touche « Terminer mon tour ». Les 11 IA jouent, les cours sont recalculés et le classement est mis à jour.']
+  ];
+  function openTuto(i) {
+    openModal(`<div class="tuto-step"><h2>${TUTO[i][0]}</h2><p>${TUTO[i][1]}</p></div>
+      <div class="tuto-dots">${TUTO.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
+      <div class="actions"><button class="btn ghost" id="tu-prev" ${i ? '' : 'disabled'}>← Précédent</button><button class="btn gold" id="tu-next">${i < TUTO.length - 1 ? 'Suivant →' : 'C\'est parti !'}</button></div>`);
+    $('#tu-prev').onclick = () => openTuto(i - 1);
+    $('#tu-next').onclick = () => (i < TUTO.length - 1 ? openTuto(i + 1) : closeModal());
+  }
+  function openSettings() {
+    openModal(`<h2>⚙️ Paramètres</h2>
+      <div class="switch-row"><span>Animations</span><input type="checkbox" id="st-anim" ${settings.anim ? 'checked' : ''}></div>
+      <div class="switch-row"><span>Pseudo par défaut</span><input id="st-name" style="width:150px" maxlength="18" value="${esc(settings.name)}"></div>
+      <div class="switch-row"><span>Sauvegarde de partie</span><button class="btn small sell" id="st-clear">Effacer</button></div>
+      <p class="muted" style="font-size:12px">Version ${CBB.VERSION} · Tout est fictif : aucune somme réelle n'est utilisée.</p>
+      <div class="actions"><button class="btn gold" id="st-ok">Enregistrer</button></div>`);
+    $('#st-clear').onclick = () => { ST.clearGame(); refreshMenu(); toast('Sauvegarde effacée'); };
+    $('#st-ok').onclick = () => { settings.anim = $('#st-anim').checked; settings.name = $('#st-name').value.trim() || 'Trader'; ST.saveSettings(settings); applySettings(); closeModal(); };
+  }
+
+  window.addEventListener('resize', () => { if (S && tab === 'charts' && $('#screen-game').classList.contains('active')) drawCharts(view()); });
+
+  /* ---------- démarrage ---------- */
+  applySettings(); refreshMenu();
+  if ('serviceWorker' in navigator && /^https?:/.test(location.protocol) && document.querySelector('link[rel=manifest]')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+  window.CBB_UI = { endTurn, getState: () => S, selectTab };
+})();
+
+</script>
+</body>
+</html>
