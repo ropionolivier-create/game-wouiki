@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#b9773b">
+<title>Poids de Panique !</title>
+<style>/* POIDS DE PANIQUE ! — styles (mobile d'abord) */
+:root{
+  --ink:#2b1d0e; --paper:#fff6e5; --paper2:#ffe9c4; --wood:#b9773b; --wood2:#8c5426;
+  --R:#e74c3c; --B:#3d8bfd; --G:#27ae60; --J:linear-gradient(135deg,#e74c3c,#f9ca24,#27ae60,#3d8bfd,#a55eea);
+  --sun:#ffb347; --ok:#2ecc71; --bad:#e74c3c; --r:14px;
+  --font:"Baloo 2","Nunito","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#3a2414;color:var(--ink);font-family:var(--font);overscroll-behavior:none}
+button{font-family:inherit;color:inherit;cursor:pointer}
+#app{max-width:560px;margin:0 auto;height:100dvh;position:relative;overflow:hidden;background:var(--paper)}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* ---------- Boutons BD ---------- */
+.btn{border:3px solid var(--ink);border-radius:var(--r);background:#fff;font-weight:800;font-size:17px;padding:12px 16px;
+  box-shadow:0 4px 0 var(--ink);transition:transform .08s, box-shadow .08s;min-height:48px}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn:disabled{opacity:.42;filter:grayscale(.7);cursor:not-allowed;box-shadow:0 2px 0 var(--ink)}
+.btn.primary{background:#ffcf40}.btn.green{background:#6ddc8b}.btn.red{background:#ff7a6b}.btn.blue{background:#7fb6ff}
+.btn.small{font-size:14px;padding:6px 10px;min-height:36px;box-shadow:0 3px 0 var(--ink);border-width:2.5px}
+.btn.icon{width:40px;height:40px;min-height:40px;padding:0;font-size:19px;display:inline-grid;place-items:center;border-radius:12px;position:relative}
+.tag{display:inline-block;font-size:11px;font-weight:800;background:var(--ink);color:#fff;border-radius:8px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.badge{position:absolute;top:-6px;right:-6px;background:var(--bad);color:#fff;font-size:11px;min-width:18px;height:18px;border-radius:9px;border:2px solid var(--ink);display:none;place-items:center;padding:0 3px}
+.badge.on{display:grid}
+
+/* ---------- Accueil ---------- */
+#scr-home{background:linear-gradient(#ffd27a,#ff9f5a 55%,#e5763f);align-items:center;justify-content:flex-start;padding:22px 18px;gap:12px}
+.logo{margin-top:4vh;text-align:center;filter:drop-shadow(0 5px 0 var(--ink))}
+.logo h1{margin:0;font-size:44px;line-height:.95;color:#fff;-webkit-text-stroke:2.5px var(--ink);letter-spacing:.5px;transform:rotate(-3deg)}
+.logo h1 span{color:#ffcf40;display:block}
+.logo p{margin:10px 0 0;font-weight:800;color:var(--ink);font-size:15px}
+.home-avatars{display:flex;justify-content:center;gap:2px;margin:6px 0}
+.home-avatars .av{width:52px;height:52px}
+.home-btns{display:flex;flex-direction:column;gap:11px;width:100%;max-width:340px;margin-top:6px}
+.home-note{font-size:12px;text-align:center;font-weight:700;opacity:.8;max-width:330px}
+
+/* ---------- Configuration ---------- */
+.topbar{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--wood);border-bottom:3px solid var(--ink);color:#fff}
+.topbar .btn{color:var(--ink)}
+.topbar h2{margin:0;font-size:20px;flex:1;-webkit-text-stroke:.6px var(--ink)}
+.setup-body{padding:12px 14px 120px;display:flex;flex-direction:column;gap:14px}
+.field label.t{font-weight:800;display:block;margin-bottom:6px}
+.field input[type=text]{width:100%;font:inherit;font-size:17px;padding:10px 12px;border:3px solid var(--ink);border-radius:12px;background:#fff}
+.seg{display:flex;flex-wrap:wrap;gap:7px}
+.seg button{flex:1 0 auto;min-width:48px;border:3px solid var(--ink);border-radius:12px;background:#fff;font-weight:800;font-size:16px;padding:9px 8px;box-shadow:0 3px 0 var(--ink)}
+.seg button.on{background:#ffcf40}
+.stepper{display:flex;align-items:center;gap:12px}
+.stepper output{font-size:28px;font-weight:900;min-width:44px;text-align:center}
+.av-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.av-grid button{border:3px solid var(--ink);border-radius:14px;background:#fff;padding:4px 2px 2px;font-size:10.5px;font-weight:800;line-height:1.1}
+.av-grid button.on{background:#ffe07a;transform:scale(1.04);box-shadow:0 0 0 3px #fff,0 0 0 6px var(--ink)}
+.av-grid .av{width:100%;aspect-ratio:1;height:auto}
+.hint{font-size:12.5px;opacity:.75;font-weight:600;margin-top:4px}
+.sticky-bottom{position:absolute;left:0;right:0;bottom:0;padding:12px 14px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--paper) 30%)}
+.sticky-bottom .btn{width:100%}
+
+/* ---------- Avatars ---------- */
+.av{display:inline-block;width:40px;height:40px;position:relative}
+.av svg,.av img{width:100%;height:100%;display:block;overflow:visible}
+.av.m-surprise svg{animation:jump .5s}
+.av.m-happy svg{animation:wiggle .6s}
+.av.m-party svg{animation:party .7s 2}
+.av.m-sad svg{animation:droop .8s}
+.av.m-think svg{animation:tilt 1.2s}
+@keyframes jump{30%{transform:translateY(-22%) scale(1.05)}60%{transform:translateY(0) scaleY(.92)}}
+@keyframes wiggle{25%{transform:rotate(-9deg)}75%{transform:rotate(9deg)}}
+@keyframes party{50%{transform:translateY(-18%) rotate(8deg)}}
+@keyframes droop{40%{transform:translateY(8%) scaleY(.88)}}
+@keyframes tilt{30%,70%{transform:rotate(-12deg)}}
+
+/* ---------- Jeu ---------- */
+#scr-game{background:var(--paper)}
+#hud{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--wood);border-bottom:3px solid var(--ink);color:#fff;z-index:5}
+#hud .info{flex:1;line-height:1.05;min-width:0}
+#hud .info b{font-size:15px;-webkit-text-stroke:.5px var(--ink);display:block;white-space:nowrap}
+#hud .info small{font-size:12px;font-weight:700;opacity:.95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+#hud .btn.icon{background:#fff;width:38px;height:38px;min-height:38px}
+
+#scene{position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;
+  background:linear-gradient(#ffcf8a 0%,#ffb067 28%,#f08a55 44%,transparent 44.2%)}
+#scene .houses{position:absolute;left:0;right:0;top:12%;height:34%;width:100%}
+#scene .ground{position:absolute;left:0;right:0;bottom:0;top:44%;
+  background-color:#b78a5e;
+  background-image:radial-gradient(ellipse 46% 40% at 50% 50%,#d1a77b 58%,transparent 62%),radial-gradient(ellipse 46% 40% at 50% 50%,#c99d70 58%,transparent 62%);
+  background-size:28px 17px,28px 17px;background-position:0 0,14px 8.5px;border-top:3px solid var(--ink)}
+#scene .lights{position:absolute;left:-2%;right:-2%;top:9%;height:24px}
+#scales{position:absolute;left:0;right:0;bottom:4px;top:20%;display:flex;justify-content:space-around;align-items:flex-end;padding:0 4px;z-index:2}
+.scale{width:31%;max-width:150px;display:flex;flex-direction:column;align-items:center;position:relative;transition:transform .3s}
+.scale .sc-info{background:#fff;border:2.5px solid var(--ink);border-radius:10px;padding:1px 6px;font-weight:900;font-size:13px;text-align:center;line-height:1.15;box-shadow:0 2px 0 var(--ink);white-space:nowrap;margin-bottom:3px}
+.scale .sc-info .mass{font-size:17px}
+.scale .sc-info .cnt{font-size:11px;font-weight:800;display:block}
+.scale.hot .sc-info{background:#ffe0a3}.scale.danger .sc-info{background:#ff9b8f;animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.scale .pan-wrap{width:100%;display:flex;flex-direction:column;align-items:center;transform-origin:50% 100%;transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.stack{width:92%;display:flex;flex-wrap:wrap-reverse;justify-content:center;align-content:flex-start;gap:2px;padding:0 2px 2px;min-height:20px}
+.cube{width:18px;height:18px;border:2px solid var(--ink);border-radius:4px;font-size:11px;font-weight:900;display:grid;place-items:center;background:#fff;box-shadow:inset -2px -2px 0 rgba(0,0,0,.18)}
+.cube[data-v="0"]{background:#eee;color:#888}.cube[data-v="1"]{background:#fff3c4}.cube[data-v="2"]{background:#ffe08a}.cube[data-v="3"]{background:#ffc75f}
+.cube[data-v="4"]{background:#ff9f5a}.cube[data-v="5"]{background:#ff7a59;color:#fff}.cube[data-v="6"]{background:#d64933;color:#fff}
+.cube.drop{animation:drop .45s cubic-bezier(.4,1.6,.6,1)}
+@keyframes drop{0%{transform:translateY(-90px) rotate(-20deg);opacity:0}60%{opacity:1}}
+.pan{width:100%;height:10px;border:3px solid var(--ink);border-radius:0 0 40px 40px;background:#ddd}
+.scale[data-c=R] .pan,.scale[data-c=R] .body{background:var(--R)}
+.scale[data-c=B] .pan,.scale[data-c=B] .body{background:var(--B)}
+.scale[data-c=G] .pan,.scale[data-c=G] .body{background:var(--G)}
+.scale .stem{width:10px;height:10px;background:#7f8c8d;border:3px solid var(--ink);border-top:0;border-bottom:0}
+.scale .body{width:78%;border:3px solid var(--ink);border-radius:14px 14px 8px 8px;padding:5px 0 6px;display:grid;place-items:center;box-shadow:0 4px 0 var(--ink)}
+.dial{width:54px;height:30px;border:3px solid var(--ink);border-bottom:0;border-radius:54px 54px 0 0;background:#fff;position:relative;overflow:hidden}
+.dial::before{content:"";position:absolute;inset:0;background:conic-gradient(from 270deg at 50% 100%,#2ecc71 0 60deg,#f9ca24 60deg 120deg,#e74c3c 120deg 180deg,transparent 0);opacity:.55}
+.needle{position:absolute;left:50%;bottom:0;width:3px;height:24px;background:var(--ink);transform-origin:50% 100%;border-radius:2px;transition:transform .6s cubic-bezier(.3,1.7,.5,1);margin-left:-1.5px}
+.scale .lbl{font-size:10px;font-weight:900;color:#fff;-webkit-text-stroke:.3px var(--ink);margin-top:2px;letter-spacing:.5px}
+.scale.tipping .pan-wrap{transform:rotate(-38deg) translateX(-20%)!important;transition:transform .35s ease-in}
+.scale.tipping{animation:shake .45s}
+@keyframes shake{20%{transform:translateX(-5px) rotate(-3deg)}40%{transform:translateX(5px) rotate(3deg)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.scale.target{filter:drop-shadow(0 0 7px #fff) drop-shadow(0 0 3px #fff)}
+#fx{position:absolute;inset:0;pointer-events:none;z-index:6}
+.fly{position:absolute;transition:transform 1.1s cubic-bezier(.2,.7,.4,1),opacity 1.1s}
+.penpop{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) scale(.3);background:#fff;border:3px solid var(--ink);border-radius:18px;padding:8px 14px;display:flex;align-items:center;gap:8px;font-weight:900;font-size:20px;box-shadow:0 5px 0 var(--ink);animation:pop 1.9s forwards;white-space:nowrap;z-index:7}
+.penpop .av{width:46px;height:46px}.penpop b{color:var(--bad);font-size:26px}
+@keyframes pop{12%{transform:translate(-50%,-50%) scale(1.15)}20%{transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
+.bubbles{position:absolute;left:6px;right:6px;top:6px;display:flex;flex-direction:column;gap:4px;z-index:4;pointer-events:none}
+.bubble{align-self:flex-start;max-width:92%;background:#fff;border:2.5px solid var(--ink);border-radius:14px 14px 14px 4px;padding:3px 9px 3px 3px;display:flex;gap:6px;align-items:center;font-size:13px;font-weight:700;box-shadow:0 2px 0 var(--ink);animation:bin .3s}
+.bubble .av{width:26px;height:26px;flex:none}.bubble.sys{background:#fff3c4}
+@keyframes bin{from{transform:translateY(-8px);opacity:0}}
+
+#queue{display:flex;align-items:center;gap:4px;padding:4px 8px;background:var(--paper2);border-top:3px solid var(--ink);overflow-x:auto;min-height:40px;scrollbar-width:none}
+#queue::-webkit-scrollbar,#players::-webkit-scrollbar{display:none}
+#queue .ql{font-weight:900;font-size:12px;flex:none}
+.qi{flex:none;display:flex;align-items:center;gap:1px;border:2px solid var(--ink);border-radius:10px;background:#fff;padding:1px 4px 1px 1px;font-weight:900;font-size:13px}
+.qi .av{width:24px;height:24px}.qi.cur{background:#ffcf40;transform:scale(1.08)}.qi.done{opacity:.35}
+.pk{display:inline-block;width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);vertical-align:-1px}
+.pk.R{background:var(--R)}.pk.B{background:var(--B)}.pk.G{background:var(--G)}.pk.J{background:var(--J)}
+
+#players{display:flex;gap:5px;padding:5px 6px;overflow-x:auto;background:#f3dcb3;border-top:3px solid var(--ink);scrollbar-width:none;flex:none}
+.pc{flex:none;width:62px;border:2.5px solid var(--ink);border-radius:12px;background:#fff;padding:2px 2px 3px;text-align:center;position:relative;font-size:10.5px;font-weight:800;line-height:1.1}
+.pc .av{width:36px;height:36px}
+.pc .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc .st{display:flex;justify-content:center;gap:4px;font-size:10.5px}
+.pc .pen{color:var(--bad)}
+.pc.me{background:#fff7c9}.pc.turn{box-shadow:0 0 0 3px #ffcf40,0 0 0 5px var(--ink);transform:translateY(-2px)}
+.pc .mk{position:absolute;top:-2px;right:-2px;font-size:13px}
+.pc .mini{position:absolute;top:1px;left:1px;background:var(--ink);color:#fff;border-radius:6px;padding:0 4px;font-size:11px}
+.pc.muted .av{opacity:.5}
+
+#panel{flex:none;background:var(--paper);border-top:3px solid var(--ink);padding:7px 10px calc(9px + env(safe-area-inset-bottom));min-height:150px}
+.pt{font-weight:900;font-size:13px;margin:2px 0 4px;display:flex;justify-content:space-between;align-items:center}
+.cards{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.card{aspect-ratio:.72;border:3px solid var(--ink);border-radius:9px;background:#fff;font-size:22px;font-weight:900;display:grid;place-items:center;box-shadow:0 3px 0 var(--ink);padding:0;position:relative;
+  background-image:radial-gradient(circle at 30% 25%,#fff 0 30%,transparent 31%),linear-gradient(#fffdf5,#ffeec2)}
+.card.on{background:#ffcf40;transform:translateY(-6px);box-shadow:0 6px 0 var(--ink)}
+.card:disabled{opacity:.25;box-shadow:none;transform:none}
+.pucks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.puck{border:3px solid var(--ink);border-radius:14px;background:#fff;padding:5px 2px;display:flex;align-items:center;justify-content:center;gap:5px;font-weight:900;font-size:13px;box-shadow:0 3px 0 var(--ink);min-height:44px}
+.puck .disc{width:24px;height:24px;border-radius:50%;border:3px solid var(--ink);flex:none}
+.puck.on{background:#ffcf40;transform:translateY(-3px)}
+.puck:disabled{opacity:.3;box-shadow:none}
+.actions{display:flex;gap:8px;margin-top:8px}.actions .btn{flex:1}
+.wait{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;padding:6px 0}
+.wait .av{width:50px;height:50px;flex:none}
+.mybet{display:inline-flex;align-items:center;gap:6px;border:2.5px solid var(--ink);border-radius:10px;padding:2px 8px;background:#fff;font-weight:900}
+.colbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+.colbtns .btn{padding:8px 4px;font-size:14px;line-height:1.15;color:#fff;-webkit-text-stroke:.4px var(--ink)}
+.colbtns .btn small{display:block;font-size:12px}
+.btn.cR{background:var(--R)}.btn.cB{background:var(--B)}.btn.cG{background:var(--G)}
+.btn.warn{outline:3px dashed #fff;outline-offset:-7px}
+.timer{height:6px;border:2px solid var(--ink);border-radius:4px;background:#fff;overflow:hidden;margin-bottom:4px}
+.timer i{display:block;height:100%;background:#ffb347;transition:width .25s linear}
+
+/* ---------- Modales et tiroirs ---------- */
+.modal{position:absolute;inset:0;background:rgba(43,29,14,.55);display:none;align-items:center;justify-content:center;padding:14px;z-index:30}
+.modal.on{display:flex}
+.sheet{background:var(--paper);border:3px solid var(--ink);border-radius:20px;box-shadow:0 6px 0 var(--ink);width:100%;max-height:92%;display:flex;flex-direction:column;overflow:hidden}
+.sheet h3{margin:0;padding:10px 14px;background:var(--wood);color:#fff;-webkit-text-stroke:.5px var(--ink);font-size:20px;border-bottom:3px solid var(--ink);display:flex;justify-content:space-between;align-items:center}
+.sheet .content{padding:12px 14px;overflow-y:auto;font-size:15px;line-height:1.4}
+.sheet .foot{padding:10px 14px;display:flex;gap:8px;border-top:3px solid var(--ink)}
+.sheet .foot .btn{flex:1}
+.content h4{margin:12px 0 4px}.content p{margin:4px 0}.content ul{margin:4px 0;padding-left:20px}
+.reveal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;perspective:600px}
+.rv{height:118px;position:relative;transform-style:preserve-3d;transition:transform .55s}
+.rv.flip{transform:rotateY(180deg)}
+.rv>div{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:3px solid var(--ink);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:11px}
+.rv .back{background:repeating-linear-gradient(45deg,#b9773b 0 8px,#a4672f 8px 16px);color:#fff;font-size:28px}
+.rv .front{background:#fff;transform:rotateY(180deg);gap:1px}
+.rv .front .av{width:38px;height:38px}
+.rv .num{font-size:30px;line-height:1;font-weight:900}
+.rv .rk{position:absolute;top:2px;left:5px;font-size:12px}
+.rank-row{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:2px dashed rgba(43,29,14,.25);font-weight:800}
+.rank-row .av{width:40px;height:40px}.rank-row .n{flex:1}.rank-row .p{font-size:20px;color:var(--bad)}
+.rank-row .pos{width:26px;text-align:center;font-size:18px}
+.test-row{font-size:13px;padding:3px 0;border-bottom:1px dashed #ccc}.test-row.ok::before{content:"✅ "}.test-row.ko::before{content:"❌ "}
+
+#chat{position:absolute;inset:0;z-index:25;display:none;flex-direction:column;background:var(--paper)}
+#chat.on{display:flex}
+#chat-list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;background:repeating-linear-gradient(#fff6e5 0 31px,#f3e2c2 31px 32px)}
+.msg{display:flex;gap:6px;align-items:flex-end;max-width:90%}
+.msg .av{width:32px;height:32px;flex:none}
+.msg .bx{background:#fff;border:2.5px solid var(--ink);border-radius:14px 14px 14px 4px;padding:4px 10px;font-size:14px;font-weight:600;word-break:break-word}
+.msg .bx b{font-size:12px;display:block}
+.msg.mine{align-self:flex-end;flex-direction:row-reverse}.msg.mine .bx{background:#ffe9a0;border-radius:14px 14px 4px 14px}
+.msg.priv .bx{background:#e4d7ff}.msg.sys{align-self:center;max-width:100%}.msg.sys .bx{background:#fff3c4;font-size:12.5px;border-radius:10px}
+#chat-foot{border-top:3px solid var(--ink);padding:6px 8px calc(8px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
+.quick{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+.quick button{flex:none;border:2px solid var(--ink);border-radius:12px;background:#fff;font-weight:700;font-size:12.5px;padding:4px 8px}
+.chat-input{display:flex;gap:6px}
+.chat-input select,.chat-input input{font:inherit;font-size:15px;border:3px solid var(--ink);border-radius:12px;padding:8px;background:#fff;min-width:0}
+.chat-input select{max-width:38%}.chat-input input{flex:1}
+.mute-list{display:flex;gap:6px;flex-wrap:wrap;padding:6px 8px;border-bottom:3px solid var(--ink);background:#f3dcb3}
+.mute-list button{border:2px solid var(--ink);border-radius:10px;background:#fff;font-size:12px;font-weight:800;padding:2px 6px;display:flex;align-items:center;gap:3px}
+.mute-list button .av{width:22px;height:22px}.mute-list button.off{opacity:.45;text-decoration:line-through}
+
+/* ---------- Résultats ---------- */
+#scr-results{background:linear-gradient(#ffd27a,#ff9f5a);align-items:center;padding:16px;gap:10px}
+#scr-results h2{font-size:34px;margin:8px 0 0;color:#fff;-webkit-text-stroke:2px var(--ink);text-align:center;transform:rotate(-2deg)}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:8px 0}
+.podium .pd{display:flex;flex-direction:column;align-items:center;font-weight:900}
+.podium .pd .av{width:64px;height:64px}
+.podium .pd .blk{width:84px;border:3px solid var(--ink);border-radius:10px 10px 0 0;background:#fff;display:grid;place-items:center;font-size:24px}
+.res-list{width:100%;background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:6px 10px;overflow-y:auto;flex:1}
+.res-btns{display:flex;gap:8px;width:100%}.res-btns .btn{flex:1}
+.confetti{position:absolute;top:-20px;width:10px;height:14px;border:1.5px solid var(--ink);animation:fall linear forwards;z-index:3}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+#toast{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);background:var(--ink);color:#fff;font-weight:800;padding:8px 14px;border-radius:14px;z-index:40;display:none;max-width:90%;text-align:center;font-size:14px}
+#toast.on{display:block;animation:bin .25s}
+
+/* ---------- Animations réduites ---------- */
+body.reduced *,body.reduced *::before{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+@media (max-height:640px){.card{font-size:18px}.pc .av{width:30px;height:30px}#panel{min-height:130px}.puck{min-height:38px}}
+@media (min-width:561px){body{background:#3a2414}#app{border-left:3px solid var(--ink);border-right:3px solid var(--ink)}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== ACCUEIL ===== -->
+  <section id="scr-home" class="screen active">
+    <div class="logo"><h1>Poids de<span>Panique !</span></h1><p>⚖️ Ne fais surtout pas basculer la balance !</p></div>
+    <div class="home-avatars" id="home-avs"></div>
+    <div class="home-btns">
+      <button class="btn primary" data-go="setup">🎲 Jouer en solo</button>
+      <button class="btn" disabled>🏠 Créer une partie <span class="tag">V2</span></button>
+      <button class="btn" disabled>🔑 Rejoindre une partie privée <span class="tag">V2</span></button>
+      <button class="btn" disabled>🌍 Parties publiques <span class="tag">V2</span></button>
+      <button class="btn blue" data-modal="rules">📜 Règles</button>
+      <button class="btn" data-modal="settings">⚙️ Paramètres</button>
+    </div>
+    <p class="home-note">Version 1 — prototype local contre les IA. Le multijoueur en ligne arrive en version 2 (serveur nécessaire).<br>Avatars provisoires dans l’esprit de Panique au Village.</p>
+  </section>
+
+  <!-- ===== CONFIGURATION SOLO ===== -->
+  <section id="scr-setup" class="screen">
+    <div class="topbar"><button class="btn icon small" data-go="home">⬅</button><h2>Partie solo</h2></div>
+    <div class="setup-body scroll" style="flex:1">
+      <div class="field"><label class="t">Ton pseudo</label><input type="text" id="cfg-name" maxlength="14" placeholder="Ton pseudo"></div>
+      <div class="field"><label class="t">Ton avatar <span class="tag">provisoire</span></label><div class="av-grid" id="cfg-avs"></div></div>
+      <div class="field"><label class="t">Nombre de joueurs (toi compris)</label>
+        <div class="stepper"><button class="btn icon" id="np-minus">−</button><output id="cfg-n">6</output><button class="btn icon" id="np-plus">+</button><span class="hint" id="cfg-n-hint"></span></div></div>
+      <div class="field"><label class="t">Nombre de cycles <small>(7 manches par cycle)</small></label><div class="seg" id="cfg-cycles" data-k="cycles"></div></div>
+      <div class="field"><label class="t">Passes par joueur pour toute la partie</label><div class="seg" id="cfg-passes" data-k="passLimit"></div><div class="hint">Le quota n’est jamais rechargé : ni à la manche suivante, ni au nouveau cycle.</div></div>
+      <div class="field"><label class="t">Difficulté des IA</label><div class="seg" id="cfg-level" data-k="level"></div></div>
+      <div class="field"><label class="t">Délai de réflexion</label><div class="seg" id="cfg-delay" data-k="delay"></div>
+        <div class="hint">À la fin du délai, une IA joue temporairement à ta place.</div></div>
+    </div>
+    <div class="sticky-bottom"><button class="btn primary" id="btn-start">⚖️ Lancer la partie</button></div>
+  </section>
+
+  <!-- ===== PLATEAU ===== -->
+  <section id="scr-game" class="screen">
+    <header id="hud">
+      <div class="info"><b id="hud-title">Cycle 1/1 · Manche 1/7</b><small id="hud-sub">Mises secrètes</small></div>
+      <button class="btn icon" id="btn-rank" title="Classement">🏆</button>
+      <button class="btn icon" id="btn-chat" title="Chat">💬<span class="badge" id="chat-badge">0</span></button>
+      <button class="btn icon" id="btn-menu" title="Menu">⏸️</button>
+    </header>
+    <div id="scene">
+      <svg class="houses" viewBox="0 0 400 110" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <g stroke="#2b1d0e" stroke-width="2.5" stroke-linejoin="round">
+          <rect x="4" y="46" width="56" height="64" fill="#f6d7a7"/><path d="M0 48 L32 16 L64 48 Z" fill="#c0392b"/><rect x="16" y="62" width="12" height="13" fill="#ffd95a"/><rect x="36" y="80" width="13" height="30" fill="#8c5426"/>
+          <rect x="70" y="58" width="50" height="52" fill="#a8d8ea"/><path d="M66 60 L95 34 L124 60 Z" fill="#6c5ce7"/><rect x="80" y="72" width="11" height="12" fill="#ffd95a"/><rect x="99" y="72" width="11" height="12" fill="#ffd95a"/>
+          <rect x="130" y="38" width="44" height="72" fill="#ffeaa7"/><path d="M126 40 L152 10 L178 40 Z" fill="#e17055"/><rect x="140" y="52" width="10" height="12" fill="#ffd95a"/><rect x="155" y="52" width="10" height="12" fill="#ffd95a"/><rect x="146" y="84" width="13" height="26" fill="#8c5426"/>
+          <rect x="183" y="20" width="34" height="90" fill="#dfe6e9"/><path d="M180 22 L200 0 L220 22 Z" fill="#2d3436"/><circle cx="200" cy="40" r="9" fill="#fff"/><path d="M200 40 L200 34 M200 40 L205 42" stroke-width="2"/>
+          <rect x="226" y="50" width="54" height="60" fill="#fab1a0"/><path d="M222 52 L253 24 L284 52 Z" fill="#00b894"/><rect x="236" y="64" width="12" height="12" fill="#ffd95a"/><rect x="258" y="64" width="12" height="12" fill="#ffd95a"/>
+          <rect x="290" y="42" width="46" height="68" fill="#81ecec"/><path d="M286 44 L313 16 L340 44 Z" fill="#d63031"/><rect x="302" y="58" width="11" height="12" fill="#ffd95a"/><rect x="318" y="86" width="12" height="24" fill="#8c5426"/>
+          <rect x="346" y="56" width="52" height="54" fill="#ffeaa7"/><path d="M342 58 L372 30 L402 58 Z" fill="#0984e3"/><rect x="356" y="70" width="12" height="12" fill="#ffd95a"/>
+        </g>
+      </svg>
+      <svg class="lights" viewBox="0 0 400 24" preserveAspectRatio="none" aria-hidden="true"><path d="M0 4 Q100 22 200 6 Q300 22 400 4" stroke="#2b1d0e" stroke-width="1.5" fill="none"/>
+        <g stroke="#2b1d0e" stroke-width="1"><circle cx="30" cy="10" r="3" fill="#ffeaa7"/><circle cx="70" cy="15" r="3" fill="#ff7675"/><circle cx="110" cy="16" r="3" fill="#74b9ff"/><circle cx="150" cy="12" r="3" fill="#ffeaa7"/><circle cx="250" cy="12" r="3" fill="#55efc4"/><circle cx="290" cy="16" r="3" fill="#ffeaa7"/><circle cx="330" cy="15" r="3" fill="#ff7675"/><circle cx="370" cy="10" r="3" fill="#74b9ff"/></g></svg>
+      <div class="ground"></div>
+      <div class="bubbles" id="bubbles"></div>
+      <div id="scales"></div>
+      <div id="fx"></div>
+    </div>
+    <div id="queue"></div>
+    <div id="players"></div>
+    <div id="panel"></div>
+  </section>
+
+  <!-- ===== RÉSULTATS ===== -->
+  <section id="scr-results" class="screen"></section>
+
+  <!-- ===== CHAT ===== -->
+  <div id="chat">
+    <div class="topbar"><button class="btn icon small" id="chat-close">⬅</button><h2>💬 Discussion</h2><button class="btn small" id="chat-mutes">🔇 Joueurs</button></div>
+    <div class="mute-list" id="mute-list" style="display:none"></div>
+    <div id="chat-list"></div>
+    <div id="chat-foot">
+      <div class="quick" id="quick"></div>
+      <div class="chat-input"><select id="chat-to"></select><input id="chat-in" maxlength="200" placeholder="Négocie, bluffe…" enterkeyhint="send"><button class="btn small primary" id="chat-send">➤</button></div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal"><div class="sheet"><h3><span id="modal-title"></span></h3><div class="content" id="modal-body"></div><div class="foot" id="modal-foot"></div></div></div>
+  <div id="toast"></div>
+</div>
+<script>/* =====================================================================
+   POIDS DE PANIQUE ! — Moteur de règles (indépendant de l'interface)
+   Utilisable dans le navigateur (window.Engine) et dans Node (require).
+   Toute action est validée ici : l'interface ne fait que demander.
+   ===================================================================== */
+(function (root) {
+  'use strict';
+
+  const COLORS = ['R', 'B', 'G'];               // Rouge, Bleue, Verte
+  const PUCK_TYPES = ['R', 'B', 'G', 'J'];      // J = arc-en-ciel (joker)
+  const LIMIT = 14;
+  const CARD_VALUES = [0, 1, 2, 3, 4, 5, 6];
+  const ROUNDS_PER_CYCLE = 7;
+  const PASS_OPTIONS = [0, 1, 2, 3, Infinity];
+
+  const ok = (extra) => Object.assign({ ok: true }, extra || {});
+  const fail = (error) => ({ ok: false, error });
+
+  function newPucks() { return { R: 2, B: 2, G: 2, J: 2 }; }
+  function massOf(scale) { return scale.cubes.reduce((a, c) => a + c.v, 0); }
+
+  /* ---------- Créer une partie ---------- */
+  function createGame(cfg) {
+    const list = cfg.players || [];
+    if (list.length < 2 || list.length > 12) throw new Error('Il faut entre 2 et 12 joueurs.');
+    const passLimit = cfg.passLimit === undefined ? 1 : cfg.passLimit;
+    const s = {
+      limit: LIMIT,
+      cycles: cfg.cycles || 1,
+      passLimit,
+      cycle: 1,
+      round: 1,
+      firstIdx: 0,          // premier joueur tournant (départage des égalités)
+      phase: 'bet',         // bet -> place -> (bet ...) -> over
+      players: list.map((p, i) => ({
+        id: i, name: p.name, avatar: p.avatar, isAI: !!p.isAI,
+        level: p.level || 'normal', persona: p.persona || null,
+        hand: [], pucks: newPucks(), penalty: 0,
+        passesLeft: passLimit, passesUsed: 0, placed: false, overflows: 0
+      })),
+      scales: { R: { cubes: [], history: [] }, B: { cubes: [], history: [] }, G: { cubes: [], history: [] } },
+      secret: {},           // mises secrètes de la manche en cours (jamais exposées avant révélation)
+      revealed: null,       // mises révélées
+      queue: [],            // file de placement (ids)
+      lastOrder: [],
+      log: []
+    };
+    dealResources(s);
+    return s;
+  }
+
+  /* ---------- Distribuer / redistribuer (toujours simultanément) ---------- */
+  function dealResources(s) {
+    s.players.forEach(p => { p.hand = CARD_VALUES.slice(); p.pucks = newPucks(); });
+  }
+
+  /* ---------- Mises secrètes ---------- */
+  function submitBet(s, pid, card, puck) {
+    if (s.phase !== 'bet') return fail('Ce n’est pas la phase des mises.');
+    const p = s.players[pid];
+    if (!p) return fail('Joueur inconnu.');
+    if (s.secret[pid]) return fail('Mise déjà validée.');           // anti double validation
+    if (!Number.isInteger(card) || !p.hand.includes(card)) return fail('Carte indisponible.');
+    if (!PUCK_TYPES.includes(puck) || !(p.pucks[puck] > 0)) return fail('Palet indisponible.');
+    s.secret[pid] = { card, puck };
+    return ok();
+  }
+  function hasBet(s, pid) { return !!s.secret[pid]; }
+  function allBetsIn(s) { return s.players.every(p => s.secret[p.id]); }
+
+  /* ---------- Ordre de placement : 6 -> 0, égalités par premier joueur tournant ---------- */
+  function computeOrder(s, bets) {
+    const n = s.players.length;
+    return s.players.map(p => p.id).sort((a, b) => {
+      const d = bets[b].card - bets[a].card;
+      if (d) return d;
+      return ((a - s.firstIdx + n) % n) - ((b - s.firstIdx + n) % n);
+    });
+  }
+
+  /* ---------- Révélation ---------- */
+  function reveal(s) {
+    if (s.phase !== 'bet') return fail('Rien à révéler.');
+    if (!allBetsIn(s)) return fail('Tous les joueurs n’ont pas validé.');
+    s.revealed = {};
+    for (const k in s.secret) s.revealed[k] = { card: s.secret[k].card, puck: s.secret[k].puck };
+    s.secret = {};
+    s.queue = computeOrder(s, s.revealed);
+    s.lastOrder = s.queue.slice();
+    // quota de passes valable pour TOUTE la partie : jamais rechargé (ni à la manche, ni au cycle)
+    s.players.forEach(p => { p.passesUsed = 0; p.placed = false; });
+    s.phase = 'place';
+    return ok({ revealed: s.revealed, order: s.queue.slice() });
+  }
+
+  /* ---------- Passes ---------- */
+  function currentPlayer(s) { return s.phase === 'place' ? s.queue[0] : null; }
+  function canPass(s, pid) {
+    if (s.phase !== 'place') return false;               // jamais pendant les mises
+    if (s.queue[0] !== pid) return false;
+    if (s.queue.length <= 1) return false;               // le dernier ne peut jamais passer
+    return s.players[pid].passesLeft > 0;
+  }
+  function pass(s, pid) {
+    if (!canPass(s, pid)) return fail('Passe interdite.');
+    s.queue.shift();
+    s.queue.push(pid);                                    // fin de file, ordre chronologique des passes
+    s.players[pid].passesLeft -= 1;                       // ne consomme ni carte ni palet
+    s.players[pid].passesUsed += 1;
+    s.log.push({ t: 'pass', pid, cycle: s.cycle, round: s.round });
+    return ok();
+  }
+
+  /* ---------- Placement ---------- */
+  function placeColor(bet, chosen) {
+    if (bet.puck === 'J') return COLORS.includes(chosen) ? chosen : null;
+    return bet.puck;
+  }
+  function place(s, pid, chosenColor) {
+    if (s.phase !== 'place') return fail('Ce n’est pas la phase de placement.');
+    if (s.queue[0] !== pid) return fail('Ce n’est pas ton tour.');
+    const p = s.players[pid];
+    const bet = s.revealed[pid];
+    const color = placeColor(bet, chosenColor);
+    if (!color) return fail('Choisis une balance pour ton palet arc-en-ciel.');
+    const sc = s.scales[color];
+    const massBefore = massOf(sc);
+    const cubesBefore = sc.cubes.length;
+    // consommation de la carte et du palet
+    p.hand.splice(p.hand.indexOf(bet.card), 1);
+    p.pucks[bet.puck] -= 1;
+    p.placed = true;
+    s.queue.shift();
+
+    const res = { pid, color, card: bet.card, puck: bet.puck, massBefore, cubesBefore,
+      massAfter: massBefore + bet.card, overflow: false, penalty: 0, lost: null };
+    if (res.massAfter > LIMIT) {
+      res.overflow = true;
+      res.penalty = calculatePenalty(cubesBefore);
+      p.penalty += res.penalty;
+      p.overflows += 1;
+      res.lost = sc.cubes.concat([{ v: bet.card, owner: pid }]);
+      resetScale(s, color);
+    } else {
+      sc.cubes.push({ v: bet.card, owner: pid });
+    }
+    sc.history.push({ pid, v: bet.card, cycle: s.cycle, round: s.round, overflow: res.overflow, penalty: res.penalty });
+    s.log.push(Object.assign({ t: 'place', cycle: s.cycle, round: s.round }, res));
+    if (s.queue.length === 0) res.roundEnd = endRound(s);
+    return ok({ result: res });
+  }
+
+  /* La pénalité = nombre de cubes déjà présents AVANT le cube fautif. */
+  function calculatePenalty(cubesBefore) { return cubesBefore; }
+  function resetScale(s, color) { s.scales[color].cubes = []; }
+
+  /* ---------- Fin de manche / cycle / partie ---------- */
+  function endRound(s) {
+    const info = { newCycle: false, gameOver: false };
+    s.revealed = null;
+    s.firstIdx = (s.firstIdx + 1) % s.players.length;
+    if (s.round >= ROUNDS_PER_CYCLE) {
+      if (s.cycle >= s.cycles) {
+        s.phase = 'over';
+        info.gameOver = true;
+        info.winners = winners(s);
+        return info;
+      }
+      s.cycle += 1;
+      s.round = 1;
+      dealResources(s);           // cartes ET palets en même temps ; balances conservées
+      info.newCycle = true;
+    } else {
+      s.round += 1;
+    }
+    s.phase = 'bet';
+    return info;
+  }
+
+  function ranking(s) {
+    return s.players.slice().sort((a, b) => a.penalty - b.penalty || a.id - b.id)
+      .map(p => ({ id: p.id, name: p.name, penalty: p.penalty }));
+  }
+  function winners(s) {
+    const min = Math.min.apply(null, s.players.map(p => p.penalty));
+    return s.players.filter(p => p.penalty === min).map(p => p.id);
+  }
+
+  /* ---------- Vue publique : ce qu'un joueur a le droit de savoir ---------- */
+  function publicView(s, viewerId) {
+    return {
+      limit: s.limit, cycles: s.cycles, passLimit: s.passLimit, cycle: s.cycle, round: s.round,
+      roundsPerCycle: ROUNDS_PER_CYCLE, firstIdx: s.firstIdx, phase: s.phase,
+      players: s.players.map(p => ({
+        id: p.id, name: p.name, avatar: p.avatar, isAI: p.isAI,
+        hand: p.hand.slice(), pucks: Object.assign({}, p.pucks), penalty: p.penalty,
+        passesLeft: p.passesLeft, passesUsed: p.passesUsed, placed: p.placed, hasBet: !!s.secret[p.id]
+      })),
+      scales: {
+        R: { cubes: s.scales.R.cubes.map(c => ({ v: c.v, owner: c.owner })), history: s.scales.R.history.slice() },
+        B: { cubes: s.scales.B.cubes.map(c => ({ v: c.v, owner: c.owner })), history: s.scales.B.history.slice() },
+        G: { cubes: s.scales.G.cubes.map(c => ({ v: c.v, owner: c.owner })), history: s.scales.G.history.slice() }
+      },
+      myBet: s.secret[viewerId] ? Object.assign({}, s.secret[viewerId]) : (s.revealed ? Object.assign({}, s.revealed[viewerId]) : null),
+      revealed: s.revealed ? JSON.parse(JSON.stringify(s.revealed)) : null,
+      queue: s.queue.slice(),
+      me: viewerId
+    };
+  }
+
+  const Engine = { COLORS, PUCK_TYPES, LIMIT, CARD_VALUES, ROUNDS_PER_CYCLE, PASS_OPTIONS,
+    createGame, dealResources, submitBet, hasBet, allBetsIn, computeOrder, reveal,
+    currentPlayer, canPass, pass, place, placeColor, calculatePenalty, resetScale,
+    endRound, ranking, winners, publicView, massOf };
+
+  if (typeof module !== 'undefined' && module.exports) module.exports = Engine;
+  else root.Engine = Engine;
+})(typeof window !== 'undefined' ? window : this);
+
+/* =====================================================================
+   POIDS DE PANIQUE ! — Intelligences artificielles
+   Les IA ne reçoivent QUE la vue publique (Engine.publicView) :
+   elles ne peuvent pas voir les mises secrètes des autres.
+   ===================================================================== */
+(function (root) {
+  'use strict';
+  const COLORS = ['R', 'B', 'G'];
+  const LIMIT = 14;
+  const CNAME = { R: 'rouge', B: 'bleue', G: 'verte' };
+
+  const PERSONAS = [
+    { style: 'taquin', noise: 0.25, chat: 0.55, aggro: 0.35 },
+    { style: 'prudent', noise: 0.12, chat: 0.35, aggro: 0.1 },
+    { style: 'bluffeur', noise: 0.35, chat: 0.6, aggro: 0.3 },
+    { style: 'chaotique', noise: 0.55, chat: 0.5, aggro: 0.2 },
+    { style: 'calculateur', noise: 0.08, chat: 0.3, aggro: 0.4 }
+  ];
+  function makePersona(i) {
+    const b = PERSONAS[i % PERSONAS.length];
+    return { style: b.style, noise: b.noise * (0.8 + Math.random() * 0.4), chat: b.chat, aggro: b.aggro * (0.7 + Math.random() * 0.6) };
+  }
+
+  /* ---------- Outils de simulation (uniquement sur informations publiques) ---------- */
+  function lite(scales) {
+    const o = {};
+    COLORS.forEach(c => { o[c] = { m: scales[c].cubes.reduce((a, x) => a + x.v, 0), n: scales[c].cubes.length }; });
+    return o;
+  }
+  function clone(l) { return { R: { m: l.R.m, n: l.R.n }, B: { m: l.B.m, n: l.B.n }, G: { m: l.G.m, n: l.G.n } }; }
+  function drop(l, c, v) {               // applique un cube, renvoie la pénalité
+    const s = l[c];
+    if (s.m + v > LIMIT) { const p = s.n; s.m = 0; s.n = 0; return p; }
+    s.m += v; s.n += 1; return 0;
+  }
+  function safeColor(l, v) {             // choix « raisonnable » d'un joker
+    let best = null, bs = Infinity;
+    COLORS.forEach(c => {
+      const s = l[c];
+      const sc = (s.m + v > LIMIT) ? 100 + s.n : (s.m + v) / LIMIT;
+      if (sc < bs) { bs = sc; best = c; }
+    });
+    return best;
+  }
+  function orderBets(bets, firstIdx, n) {
+    return bets.slice().sort((a, b) => (b.card - a.card) || (((a.pid - firstIdx + n) % n) - ((b.pid - firstIdx + n) % n)));
+  }
+  function simulate(l, seq) {            // seq : [{pid, card, puck}] dans l'ordre de placement
+    const pen = {};
+    seq.forEach(b => {
+      const c = b.puck === 'J' ? (b.color || safeColor(l, b.card)) : b.puck;
+      pen[b.pid] = (pen[b.pid] || 0) + drop(l, c, b.card);
+    });
+    return pen;
+  }
+  function rnd(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function samplePuck(p) {
+    const w = []; ['R', 'B', 'G', 'J'].forEach(k => { for (let i = 0; i < p.pucks[k]; i++) w.push(k); });
+    return rnd(w);
+  }
+
+  /* ---------- Choix de la mise secrète ---------- */
+  function options(me) {
+    const o = [];
+    me.hand.forEach(card => ['R', 'B', 'G', 'J'].forEach(puck => { if (me.pucks[puck] > 0) o.push({ card, puck }); }));
+    return o;
+  }
+  function chooseBet(v, player) {
+    const lvl = player.level || 'normal';
+    const persona = player.persona || PERSONAS[0];
+    const me = v.players[v.me];
+    const opts = options(me);
+    if (lvl === 'easy' && Math.random() < 0.45) return rnd(opts);
+    const samples = lvl === 'expert' ? 120 : lvl === 'normal' ? 30 : 8;
+    const wOpp = 0;
+    const base = lite(v.scales);
+    const n = v.players.length;
+    const roundsLeft = v.roundsPerCycle - v.round + 1;
+    const others = v.players.filter(p => p.id !== v.me);
+
+    // tirages des mises adverses (cartes/palets restants = information publique)
+    // Expert : modélise des adversaires raisonnables qui évitent les placements évidemment perdants.
+    const models = others.map(p => {
+      const os = options(p);
+      const w = os.map(o => {
+        if (lvl !== 'expert') return 1;
+        const c = o.puck === 'J' ? safeColor(base, o.card) : o.puck;
+        const t = clone(base); const pen = drop(t, c, o.card);
+        return Math.exp(-0.6 * pen) * (o.puck === 'J' ? 0.7 : 1) * (1 + o.card * 0.05);
+      });
+      return { pid: p.id, os, w, tot: w.reduce((a, b) => a + b, 0) };
+    });
+    const draws = [];
+    for (let k = 0; k < samples; k++) {
+      draws.push(models.map(m => {
+        let r = Math.random() * m.tot, i = 0;
+        while (i < m.w.length - 1 && (r -= m.w[i]) > 0) i++;
+        return { pid: m.pid, card: m.os[i].card, puck: m.os[i].puck };
+      }));
+    }
+    let best = null, bestScore = Infinity;
+    opts.forEach(o => {
+      let my = 0, opp = 0;
+      draws.forEach(d => {
+        const seq = orderBets(d.concat([{ pid: v.me, card: o.card, puck: o.puck }]), v.firstIdx, n);
+        const pen = simulate(clone(base), seq);
+        my += pen[v.me] || 0;
+        others.forEach(p => { opp += pen[p.id] || 0; });
+      });
+      my /= samples; opp /= samples * Math.max(1, others.length);
+      // valeur des ressources : garder jokers et petites cartes pour les moments chauds
+      let cost = 0;
+      if (o.puck === 'J') cost += roundsLeft > me.pucks.J + 1 ? 0.6 : 0.15;
+      if (roundsLeft > 1) cost += (6 - o.card) * 0.07;
+      // une couleur dont on a encore 2 palets est plus « souple » à jouer
+      if (o.puck !== 'J' && me.pucks[o.puck] === 2) cost -= 0.05;
+      const score = my - wOpp * opp + cost + (Math.random() - 0.5) * persona.noise * (lvl === 'easy' ? 3 : 1);
+      if (score < bestScore) { bestScore = score; best = o; }
+    });
+    return best || rnd(opts);
+  }
+
+  /* ---------- Décision au moment du placement (mises révélées) ---------- */
+  function choosePlacement(v, player) {
+    const lvl = player.level || 'normal';
+    const persona = player.persona || PERSONAS[0];
+    const me = v.players[v.me];
+    const bet = v.revealed[v.me];
+    const colors = bet.puck === 'J' ? COLORS.slice() : [bet.puck];
+    const passOk = v.queue[0] === v.me && v.queue.length > 1 && me.passesLeft > 0 && me.passesUsed < 3;
+    const base = lite(v.scales);
+    const rest = v.queue.slice(1).map(pid => ({ pid, card: v.revealed[pid].card, puck: v.revealed[pid].puck }));
+    const wOpp = lvl === 'expert' ? persona.aggro * 0.15 : 0;   // l'expert peut charger une balance pour piéger
+
+    const evalPlace = c => {
+      const l = clone(base);
+      const my = drop(l, c, bet.card);
+      const pen = simulate(l, rest);
+      let opp = 0; for (const k in pen) opp += pen[k];
+      // risque laissé pour la suite (balances proches de 14 avec beaucoup de cubes)
+      const after = l[c]; const risk = after.n * Math.max(0, after.m - 9) / 50;
+      return { my, opp, risk };
+    };
+    const evalPass = () => {
+      const l = clone(base);
+      const pen = simulate(l, rest);
+      let best = Infinity, bc = colors[0];
+      colors.forEach(c => { const t = clone(l); const p = drop(t, c, bet.card); if (p < best) { best = p; bc = c; } });
+      let opp = 0; for (const k in pen) opp += pen[k];
+      return { my: best, opp, color: bc };
+    };
+
+    if (lvl === 'easy') {
+      const c = bet.puck === 'J' ? (Math.random() < 0.5 ? rnd(COLORS) : safeColor(base, bet.card)) : bet.puck;
+      const pNow = clone(base); const pen = drop(pNow, c, bet.card);
+      if (passOk && ((pen > 0 && Math.random() < 0.4) || Math.random() < 0.02)) return { action: 'pass' };
+      return { action: 'place', color: c };
+    }
+    let best = null, bs = Infinity;
+    colors.forEach(c => {
+      const e = evalPlace(c);
+      const s = e.my - wOpp * e.opp + e.risk * 0.3 + Math.random() * persona.noise * 0.1;
+      if (s < bs) { bs = s; best = { c, e }; }
+    });
+    if (passOk) {
+      // une passe sert pour toute la partie : plus il reste de manches, plus elle est précieuse
+      const roundsLeftGame = (v.cycles - v.cycle) * v.roundsPerCycle + (v.roundsPerCycle - v.round);
+      const passCost = me.passesLeft === Infinity ? 0.2 : 0.5 + roundsLeftGame / (me.passesLeft * 5);
+      const p = evalPass();
+      const ps = p.my - wOpp * p.opp;
+      if (lvl === 'normal' && best.e.my > 0 && best.e.my - p.my >= Math.min(passCost, 3)) return { action: 'pass' };
+      if (lvl === 'expert' && ps < bs - passCost) return { action: 'pass' };
+    }
+    return { action: 'place', color: best.c };
+  }
+
+  /* ---------- Dialogues programmés (aucune API externe) ---------- */
+  const LINES = {
+    roundStart: {
+      taquin: ['Allez, qui va faire tout tomber cette fois ?', 'Je sens que quelqu’un va pleurer…', 'Vous tremblez ? Moi non.'],
+      prudent: ['On reste calme et on pose doucement…', 'Pas de folie cette manche, d’accord ?'],
+      bluffeur: ['J’ai LA carte parfaite. Si si.', 'Je vous préviens : je joue gros.', 'Moi ? Je vais jouer le 0. Évidemment.'],
+      chaotique: ['Et si on chargeait tout sur la même ? Pour rire ?', 'Hihi, j’ai un plan. Enfin presque.'],
+      calculateur: ['Statistiquement, quelqu’un va morfler.', 'J’ai fait mes calculs. Désolé d’avance.']
+    },
+    danger: ['La {c} commence à être dangereuse !', 'Je sens que la {c} va basculer !', 'Personne ne touche à la {c}, hein ?', 'Tu me promets de ne pas charger la {c} ?'],
+    wantPass: ['Quelqu’un veut bien passer avant moi ?', 'Je laisse ma place volontiers…'],
+    passed: ['Je passe, à vous l’honneur !', 'Après vous, j’insiste.', 'Moi ? Plus tard. Beaucoup plus tard.'],
+    gotHit: ['Bien joué… mais je retiens ça !', 'Noooon ! Mes cubes !', 'C’était un piège, avouez !', 'Je vais me venger, {n}.'],
+    otherHit: ['Ha ! Merci {n}, très généreux !', 'Aïe, ça pique pour {n}…', 'Bien fait, {n} ! Enfin… désolé.', 'Paf ! {pen} points pour {n} !'],
+    safe: ['Ouf. Ça passe.', 'Tranquille.', 'Même pas peur.'],
+    newCycle: ['Nouvelles cartes ! Mais les balances restent pleines…', 'On repart, mais attention, ça reste lourd !'],
+    replyPromise: { taquin: ['Promis… peut-être.', 'Ça dépend de ce que tu m’offres !'], prudent: ['D’accord, je fais attention.', 'Promis, je ne charge pas.'], bluffeur: ['Promis juré ! (hé hé)', 'Évidemment, tu peux me faire confiance.'], chaotique: ['Je ne promets jamais rien !', 'Promis ! Enfin, je crois.'], calculateur: ['Je joue ce qui est optimal. Désolé.', 'On verra selon les cartes.'] },
+    replyColor: ['La {c} ? Je n’y touche pas. Peut-être.', 'Moi aussi j’ai l’œil sur la {c}.', 'La {c}, c’est un piège, tout le monde le sait.'],
+    replyPass: ['Passer ? Toi d’abord !', 'Je garde ma passe pour plus tard.', 'Si tu passes, je passe aussi !'],
+    replyAny: ['Hmm, intéressant…', 'Tu bluffes, je le sens.', 'On verra bien !', 'Chut, je réfléchis.', 'Pas mal, pas mal…']
+  };
+  function fill(t, ctx) { return t.replace('{c}', CNAME[ctx.c] || '').replace('{n}', ctx.n || '').replace('{pen}', ctx.pen || ''); }
+  function say(kind, persona, ctx) {
+    ctx = ctx || {};
+    let pool = LINES[kind];
+    if (!pool) return null;
+    if (!Array.isArray(pool)) pool = pool[persona.style] || pool.taquin;
+    return fill(rnd(pool), ctx);
+  }
+  function reply(text, persona) {
+    const t = text.toLowerCase();
+    const col = /rouge/.test(t) ? 'R' : /bleu/.test(t) ? 'B' : /vert/.test(t) ? 'G' : null;
+    if (/promet|promis|allian|deal|accord|ensemble/.test(t)) return say('replyPromise', persona);
+    if (/pass/.test(t)) return say('replyPass', persona);
+    if (col) return say('replyColor', persona, { c: col });
+    return say('replyAny', persona);
+  }
+  // couleur la plus dangereuse visible publiquement
+  function hottest(v) {
+    const l = lite(v.scales); let c = null, b = 0;
+    COLORS.forEach(k => { const r = l[k].m / LIMIT * (1 + l[k].n / 8); if (r > b) { b = r; c = k; } });
+    return b > 0.65 ? c : null;
+  }
+
+  const AI = { makePersona, chooseBet, choosePlacement, say, reply, hottest, safeColor, lite };
+  if (typeof module !== 'undefined' && module.exports) module.exports = AI;
+  else root.AI = AI;
+})(typeof window !== 'undefined' ? window : this);
+
+/* =====================================================================
+   POIDS DE PANIQUE ! — AVATARS PROVISOIRES
+   Dessinés en SVG dans l'esprit de Panique au Village (bonhomme rond,
+   salopette, chapeaux). À REMPLACER par les fichiers originaux :
+   renseigner AVATAR_FILES (chemins PNG/SVG) et ils seront utilisés
+   à la place des dessins provisoires.
+   ===================================================================== */
+(function (root) {
+  'use strict';
+  const INK = '#2b1d0e';
+
+  // Mettre ici les fichiers originaux de Panique au Village, ex. { 0: 'assets/avatars/bob.png', ... }
+  const AVATAR_FILES = {};
+
+  const AVATARS = [
+    { name: 'Bobby Paille', body: '#4aa3df', suit: '#8a5a2b', hat: 'straw' },
+    { name: 'Mamie Rose', body: '#f78fb3', suit: '#6c5ce7', hat: 'flowers' },
+    { name: 'Gaston Béret', body: '#f6c344', suit: '#2d6cdf', hat: 'beret' },
+    { name: 'Lulu Casquette', body: '#7bd389', suit: '#2d6cdf', hat: 'cap' },
+    { name: 'Marcel Gibus', body: '#c39bd3', suit: '#34495e', hat: 'tophat' },
+    { name: 'Fifi Bandana', body: '#ff8c42', suit: '#2d6cdf', hat: 'bandana' },
+    { name: 'Chef Paulo', body: '#f1e0c5', suit: '#c0392b', hat: 'chef' },
+    { name: 'Gégé Cowboy', body: '#e17055', suit: '#2d6cdf', hat: 'cowboy' },
+    { name: 'Reine Josette', body: '#a29bfe', suit: '#e84393', hat: 'crown' },
+    { name: 'Nono Bonnet', body: '#55efc4', suit: '#d35400', hat: 'beanie' },
+    { name: 'Pompier Max', body: '#fdcb6e', suit: '#2d3436', hat: 'helmet' },
+    { name: 'Zaza Nœud', body: '#74b9ff', suit: '#e84393', hat: 'bow' }
+  ];
+
+  function hat(type) {
+    const s = `stroke="${INK}" stroke-width="3" stroke-linejoin="round"`;
+    switch (type) {
+      case 'straw': return `<path d="M33 31 Q35 13 50 13 Q65 13 67 31 Z" fill="#f2c94c" ${s}/><ellipse cx="50" cy="31" rx="33" ry="7" fill="#f7d774" ${s}/><rect x="34" y="25" width="32" height="5" fill="#e17055"/><circle cx="64" cy="22" r="4.5" fill="#ff7675" ${s}/><circle cx="64" cy="22" r="1.6" fill="#ffeaa7"/>`;
+      case 'flowers': return `${[30, 40, 50, 60, 70].map((x, i) => `<circle cx="${x}" cy="${29 - (i % 2) * 3}" r="5" fill="${['#ff7675', '#ffeaa7', '#81ecec', '#fd79a8', '#a29bfe'][i]}" ${s}/>`).join('')}`;
+      case 'beret': return `<ellipse cx="46" cy="27" rx="25" ry="8" fill="#c0392b" ${s}/><path d="M46 19 l2 -5" ${s} fill="none"/>`;
+      case 'cap': return `<path d="M30 32 Q30 14 50 14 Q70 14 70 32 Z" fill="#e74c3c" ${s}/><path d="M60 31 Q80 29 84 34 Q72 37 60 35 Z" fill="#c0392b" ${s}/><circle cx="50" cy="14" r="2.5" fill="#fff" ${s}/>`;
+      case 'tophat': return `<rect x="36" y="4" width="28" height="25" rx="2" fill="#2d3436" ${s}/><rect x="36" y="21" width="28" height="5" fill="#e84393"/><ellipse cx="50" cy="30" rx="25" ry="5" fill="#2d3436" ${s}/>`;
+      case 'bandana': return `<path d="M27 35 Q28 15 50 15 Q72 15 73 35 Q50 28 27 35 Z" fill="#e74c3c" ${s}/><circle cx="42" cy="24" r="1.6" fill="#fff"/><circle cx="55" cy="21" r="1.6" fill="#fff"/><circle cx="62" cy="28" r="1.6" fill="#fff"/><path d="M73 33 l9 -4 l-2 9 Z" fill="#e74c3c" ${s}/>`;
+      case 'chef': return `<rect x="35" y="20" width="30" height="11" fill="#fff" ${s}/><circle cx="39" cy="14" r="8" fill="#fff" ${s}/><circle cx="50" cy="10" r="9" fill="#fff" ${s}/><circle cx="61" cy="14" r="8" fill="#fff" ${s}/><rect x="36.5" y="17" width="27" height="6" fill="#fff"/>`;
+      case 'cowboy': return `<path d="M14 30 Q50 42 86 30 Q80 38 50 39 Q20 38 14 30 Z" fill="#a0522d" ${s}/><path d="M34 32 Q33 12 42 12 Q50 17 58 12 Q67 12 66 32 Z" fill="#b5651d" ${s}/><rect x="34" y="27" width="32" height="4" fill="#2d3436"/>`;
+      case 'crown': return `<path d="M32 31 L32 14 L41 23 L50 10 L59 23 L68 14 L68 31 Z" fill="#f9ca24" ${s}/><circle cx="50" cy="24" r="3" fill="#e84393" ${s}/>`;
+      case 'beanie': return `<path d="M29 33 Q29 12 50 12 Q71 12 71 33 Z" fill="#0984e3" ${s}/><rect x="28" y="28" width="44" height="7" rx="3" fill="#74b9ff" ${s}/><circle cx="50" cy="10" r="6" fill="#ffeaa7" ${s}/>`;
+      case 'helmet': return `<path d="M29 32 Q29 11 50 11 Q71 11 71 32 Z" fill="#d63031" ${s}/><path d="M22 32 Q50 40 78 32 L78 35 Q50 43 22 35 Z" fill="#b71c1c" ${s}/><rect x="45" y="15" width="10" height="9" rx="2" fill="#f9ca24" ${s}/>`;
+      case 'bow': return `<path d="M50 24 L36 15 L36 33 Z" fill="#fd79a8" ${s}/><path d="M50 24 L64 15 L64 33 Z" fill="#fd79a8" ${s}/><circle cx="50" cy="24" r="4.5" fill="#e84393" ${s}/>`;
+      default: return '';
+    }
+  }
+
+  function face(mood) {
+    const s = `stroke="${INK}" stroke-width="3" stroke-linecap="round" fill="none"`;
+    let eyes, mouth, brows = '';
+    const eye = (x, dy) => `<ellipse cx="${x}" cy="50" rx="6" ry="7" fill="#fff" stroke="${INK}" stroke-width="2.5"/><circle cx="${x + 1}" cy="${51 + (dy || 0)}" r="3" fill="${INK}"/>`;
+    eyes = eye(40) + eye(60);
+    switch (mood) {
+      case 'happy': mouth = `<path d="M38 64 Q50 76 62 64 Z" fill="#c0392b" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`; break;
+      case 'party':
+        eyes = `<path d="M34 51 Q40 44 46 51" ${s}/><path d="M54 51 Q60 44 66 51" ${s}/>`;
+        mouth = `<path d="M37 63 Q50 78 63 63 Z" fill="#c0392b" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`; break;
+      case 'surprise':
+        brows = `<path d="M34 39 Q40 35 46 39" ${s}/><path d="M54 39 Q60 35 66 39" ${s}/>`;
+        mouth = `<ellipse cx="50" cy="68" rx="5" ry="6" fill="#c0392b" stroke="${INK}" stroke-width="3"/>`; break;
+      case 'sad':
+        eyes = eye(40, 2) + eye(60, 2);
+        brows = `<path d="M34 41 L46 38" ${s}/><path d="M54 38 L66 41" ${s}/>`;
+        mouth = `<path d="M40 71 Q50 63 60 71" ${s}/>`; break;
+      case 'think':
+        eyes = eye(40, -2) + eye(60, -2);
+        brows = `<path d="M54 39 Q60 36 66 40" ${s}/>`;
+        mouth = `<path d="M43 68 L57 66" ${s}/>`; break;
+      default: mouth = `<path d="M41 65 Q50 72 59 65" ${s}/>`;
+    }
+    return brows + eyes + `<ellipse cx="31" cy="60" rx="4.5" ry="3" fill="#ff7675" opacity=".55"/><ellipse cx="69" cy="60" rx="4.5" ry="3" fill="#ff7675" opacity=".55"/>` + mouth;
+  }
+
+  function avatarSVG(id, mood) {
+    const a = AVATARS[id % AVATARS.length];
+    if (AVATAR_FILES[id]) return `<img src="${AVATAR_FILES[id]}" alt="${a.name}" class="av-img">`;
+    return `<svg viewBox="0 0 100 100" class="av-svg" aria-label="${a.name}">
+      <ellipse cx="50" cy="96" rx="25" ry="3.5" fill="rgba(0,0,0,.2)"/>
+      <path d="M22 62 Q22 30 50 30 Q78 30 78 62 L78 81 Q78 94 65 94 L35 94 Q22 94 22 81 Z" fill="${a.body}" stroke="${INK}" stroke-width="3"/>
+      <path d="M25 76 L75 76 L75 82 Q75 92 64 92 L36 92 Q25 92 25 82 Z" fill="${a.suit}" stroke="${INK}" stroke-width="2.5"/>
+      <path d="M33 77 L30 66 M67 77 L70 66" stroke="${a.suit}" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="33" cy="79" r="2" fill="#f9ca24" stroke="${INK}" stroke-width="1.2"/><circle cx="67" cy="79" r="2" fill="#f9ca24" stroke="${INK}" stroke-width="1.2"/>
+      ${face(mood)}${hat(a.hat)}</svg>`;
+  }
+
+  root.Avatars = { AVATARS, AVATAR_FILES, avatarSVG, PROVISOIRE: Object.keys(AVATAR_FILES).length === 0 };
+})(typeof window !== 'undefined' ? window : this);
+
+/* =====================================================================
+   POIDS DE PANIQUE ! — Tests des règles (navigateur : Paramètres > Tests ;
+   Node : node tests/run-tests.js)
+   ===================================================================== */
+(function (root) {
+  'use strict';
+
+  function runTests(Engine, AI) {
+    const results = [];
+    const T = (name, fn) => {
+      try { const r = fn(); results.push({ name, ok: r !== false }); }
+      catch (e) { results.push({ name, ok: false, err: e.message }); }
+    };
+    const assert = (c, m) => { if (!c) throw new Error(m || 'assertion'); };
+    const mk = (n, passLimit, cycles) => Engine.createGame({
+      players: Array.from({ length: n }, (_, i) => ({ name: 'J' + i, isAI: i > 0, level: 'normal' })),
+      passLimit: passLimit === undefined ? 1 : passLimit, cycles: cycles || 2
+    });
+    const betAll = (s, bets) => bets.forEach((b, i) => assert(Engine.submitBet(s, i, b[0], b[1]).ok, 'mise ' + i));
+    const placeAll = (s, color) => { while (s.phase === 'place') assert(Engine.place(s, s.queue[0], color || 'R').ok, 'placement'); };
+
+    T('1. Une carte utilisée ne peut plus être rejouée pendant le cycle', () => {
+      const s = mk(2); betAll(s, [[3, 'R'], [2, 'B']]); Engine.reveal(s); placeAll(s);
+      assert(!Engine.submitBet(s, 0, 3, 'G').ok, 'la carte 3 devrait être refusée');
+      assert(Engine.submitBet(s, 0, 4, 'G').ok);
+    });
+    T('2. Un palet utilisé ne peut plus être rejoué', () => {
+      const s = mk(2);
+      betAll(s, [[0, 'J'], [0, 'B']]); Engine.reveal(s); placeAll(s, 'G');
+      betAll(s, [[1, 'J'], [1, 'B']]); Engine.reveal(s); placeAll(s, 'G');
+      assert(s.players[0].pucks.J === 0);
+      assert(!Engine.submitBet(s, 0, 2, 'J').ok, 'plus de joker');
+    });
+    T('3. Les mises restent secrètes jusqu’à la révélation', () => {
+      const s = mk(3); Engine.submitBet(s, 1, 6, 'R');
+      const v = Engine.publicView(s, 0);
+      assert(v.revealed === null && v.myBet === null, 'rien de visible');
+      assert(JSON.stringify(v).indexOf('"card":6') === -1, 'la carte 6 de J1 ne doit pas fuiter');
+      assert(v.players[1].hasBet === true, 'on sait seulement qu’il a validé');
+      const v1 = Engine.publicView(s, 1); assert(v1.myBet.card === 6, 'le joueur voit sa propre mise');
+    });
+    T('4. Le joker choisit sa couleur uniquement au placement', () => {
+      const s = mk(2);
+      assert(!Engine.submitBet(s, 0, 2, 'R_JOKER').ok);
+      betAll(s, [[2, 'J'], [1, 'R']]); Engine.reveal(s);
+      assert(!Engine.place(s, 0).ok, 'couleur obligatoire');
+      assert(Engine.place(s, 0, 'B').ok); assert(s.scales.B.cubes.length === 1);
+    });
+    T('5. On ne peut passer qu’après la révélation', () => {
+      const s = mk(3);
+      assert(!Engine.canPass(s, 0) && !Engine.pass(s, 0).ok);
+      betAll(s, [[5, 'R'], [3, 'R'], [1, 'R']]); Engine.reveal(s);
+      assert(Engine.pass(s, 0).ok);
+    });
+    T('6. Le nombre maximal de passes (par partie) est respecté', () => {
+      const s = mk(3, 2); betAll(s, [[6, 'R'], [3, 'R'], [1, 'R']]); Engine.reveal(s);
+      assert(Engine.pass(s, 0).ok); Engine.place(s, 1, 'R');
+      assert(Engine.pass(s, 2).ok); // file : 0, 2
+      assert(Engine.pass(s, 0).ok); // 2 passes utilisées
+      Engine.place(s, 2, 'R');
+      const s2 = mk(3, 2); betAll(s2, [[6, 'R'], [3, 'R'], [1, 'R']]); Engine.reveal(s2);
+      Engine.pass(s2, 0); Engine.pass(s2, 1); Engine.pass(s2, 2); Engine.pass(s2, 0); Engine.pass(s2, 1);
+      assert(s2.players[0].passesLeft === 0);
+      // file : 2,0,1 -> 2 passe sa 2e, puis 0 n'a plus de passe
+      assert(Engine.pass(s2, 2).ok); assert(s2.queue[0] === 0 && !Engine.canPass(s2, 0), '0 doit placer');
+      const s3 = mk(2, 0); betAll(s3, [[6, 'R'], [3, 'R']]); Engine.reveal(s3); assert(!Engine.canPass(s3, 0), 'limite 0');
+    });
+    T('6b. Le quota de passes vaut pour toute la partie (pas de recharge)', () => {
+      const s = mk(2, 1, 2); betAll(s, [[6, 'R'], [3, 'B']]); Engine.reveal(s);
+      assert(Engine.pass(s, 0).ok); placeAll(s);
+      assert(s.players[0].passesLeft === 0, 'quota consommé');
+      betAll(s, [[5, 'R'], [2, 'B']]); Engine.reveal(s);
+      assert(!Engine.canPass(s, 0), 'pas de recharge à la manche suivante');
+      while (s.cycle === 1) { if (s.phase === 'bet') { s.players.forEach(p => Engine.submitBet(s, p.id, p.hand[0], ['R', 'B', 'G', 'J'].find(k => p.pucks[k] > 0))); Engine.reveal(s); } else Engine.place(s, s.queue[0], 'G'); }
+      assert(s.players[0].passesLeft === 0 && s.players[1].passesLeft === 1, 'pas de recharge au nouveau cycle');
+    });
+    T('7. Le dernier joueur ne peut pas passer', () => {
+      const s = mk(2, Infinity); betAll(s, [[6, 'R'], [3, 'B']]); Engine.reveal(s);
+      Engine.place(s, 0, 'R'); assert(s.queue.length === 1 && !Engine.canPass(s, 1));
+    });
+    T('8. Les joueurs ayant passé reviennent dans l’ordre chronologique', () => {
+      const s = mk(4, 1); betAll(s, [[6, 'R'], [5, 'B'], [4, 'G'], [3, 'R']]); Engine.reveal(s);
+      Engine.pass(s, 0); Engine.pass(s, 1); // file : 2,3,0,1
+      assert(s.queue.join() === '2,3,0,1', s.queue.join());
+      Engine.place(s, 2, 'G'); Engine.place(s, 3, 'R'); assert(s.queue.join() === '0,1');
+    });
+    T('9. Cartes et palets redistribués simultanément après 7 manches', () => {
+      const s = mk(2, 1, 2);
+      for (let r = 0; r < 7; r++) {
+        const p0 = s.players[0], p1 = s.players[1];
+        const pk = p => ['J', 'R', 'B', 'G'].find(k => p.pucks[k] > 0);
+        betAll(s, [[p0.hand[0], pk(p0)], [p1.hand[0], pk(p1)]]); Engine.reveal(s);
+        while (s.phase === 'place') Engine.place(s, s.queue[0], 'G');
+        if (r < 6) assert(s.players[0].hand.length === 6 - r);
+      }
+      assert(s.cycle === 2 && s.round === 1);
+      s.players.forEach(p => { assert(p.hand.length === 7); assert(p.pucks.R === 2 && p.pucks.B === 2 && p.pucks.G === 2 && p.pucks.J === 2); });
+    });
+    T('10. Les balances conservent leurs cubes entre les cycles', () => {
+      const s = mk(2, 1, 2);
+      for (let r = 0; r < 7; r++) {
+        const pk = p => ['R', 'B', 'G', 'J'].find(k => p.pucks[k] > 0);
+        betAll(s, s.players.map(p => [p.hand.indexOf(0) >= 0 ? 0 : p.hand[0], pk(p)]));
+        Engine.reveal(s); while (s.phase === 'place') Engine.place(s, s.queue[0], 'G');
+      }
+      const total = ['R', 'B', 'G'].reduce((a, c) => a + s.scales[c].cubes.length + s.scales[c].history.filter(h => h.overflow).length * 0, 0);
+      assert(s.cycle === 2 && total > 0, 'des cubes doivent rester');
+    });
+    T('11. Les cubes de valeur 0 comptent dans les pénalités (ex. 2 : 11 pts)', () => {
+      const s = mk(2); s.scales.B.cubes = [2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0].map(v => ({ v, owner: 1 }));
+      betAll(s, [[1, 'B'], [0, 'R']]); Engine.reveal(s);
+      const r = Engine.place(s, 0).result; assert(r.overflow && r.penalty === 11, 'pénalité ' + r.penalty);
+    });
+    T('12. Le cube fautif n’est pas compté (ex. 1 : 2 pts ; ex. 3 : 8 pts)', () => {
+      const s = mk(2); s.scales.R.cubes = [{ v: 6, owner: 1 }, { v: 6, owner: 1 }];
+      s.scales.G.cubes = [0, 0, 0, 0, 0, 0, 6, 5].map(v => ({ v, owner: 1 }));
+      betAll(s, [[4, 'R'], [4, 'G']]); Engine.reveal(s);
+      const a = Engine.place(s, s.queue[0]).result; const b = Engine.place(s, s.queue[0]).result;
+      const red = a.color === 'R' ? a : b, green = a.color === 'G' ? a : b;
+      assert(red.penalty === 2 && green.penalty === 8, red.penalty + '/' + green.penalty);
+    });
+    T('13. Seule la balance dépassant 14 est vidée', () => {
+      const s = mk(2); s.scales.R.cubes = [{ v: 6, owner: 1 }, { v: 6, owner: 1 }];
+      s.scales.B.cubes = [{ v: 5, owner: 1 }]; s.scales.G.cubes = [{ v: 3, owner: 1 }];
+      betAll(s, [[4, 'R'], [0, 'B']]); Engine.reveal(s); Engine.place(s, 0);
+      assert(s.scales.R.cubes.length === 0 && s.scales.B.cubes.length === 1 && s.scales.G.cubes.length === 1);
+      assert(s.players[0].penalty === 2);
+    });
+    T('Masse exactement 14 : pas de bascule', () => {
+      const s = mk(2); s.scales.R.cubes = [{ v: 6, owner: 1 }, { v: 6, owner: 1 }];
+      betAll(s, [[2, 'R'], [0, 'B']]); Engine.reveal(s); const r = Engine.place(s, 0).result;
+      assert(!r.overflow && Engine.massOf(s.scales.R) === 14);
+    });
+    T('Ordre 6→0 et égalités par premier joueur tournant', () => {
+      const s = mk(4); s.firstIdx = 2;
+      betAll(s, [[3, 'R'], [5, 'R'], [3, 'B'], [3, 'G']]); Engine.reveal(s);
+      assert(s.queue.join() === '1,2,3,0', s.queue.join());
+    });
+    T('Double validation refusée', () => {
+      const s = mk(2); assert(Engine.submitBet(s, 0, 1, 'R').ok); assert(!Engine.submitBet(s, 0, 2, 'B').ok);
+    });
+    if (AI) {
+      T('14. Les IA respectent toutes les règles (200 parties simulées)', () => {
+        for (let g = 0; g < 200; g++) {
+          const lv = ['easy', 'normal', 'expert'][g % 3];
+          const n = 2 + (g % 11);
+          const pl = [0, 1, 2, 3, Infinity][g % 5];
+          const s = Engine.createGame({ players: Array.from({ length: n }, (_, i) => ({ name: 'IA' + i, isAI: true, level: lv, persona: AI.makePersona(i) })), passLimit: pl, cycles: 1 + (g % 2) });
+          let guard = 0;
+          while (s.phase !== 'over' && guard++ < 5000) {
+            if (s.phase === 'bet') {
+              s.players.forEach(p => { const b = AI.chooseBet(Engine.publicView(s, p.id), p); const r = Engine.submitBet(s, p.id, b.card, b.puck); assert(r.ok, 'mise IA refusée : ' + r.error); });
+              assert(Engine.reveal(s).ok);
+            } else {
+              const pid = s.queue[0]; const p = s.players[pid];
+              const d = AI.choosePlacement(Engine.publicView(s, pid), p);
+              const r = d.action === 'pass' ? Engine.pass(s, pid) : Engine.place(s, pid, d.color);
+              assert(r.ok, 'action IA refusée : ' + r.error);
+            }
+          }
+          assert(s.phase === 'over', 'partie bloquée');
+        }
+      });
+    }
+    return results;
+  }
+
+  if (typeof module !== 'undefined' && module.exports) module.exports = runTests;
+  else root.runTests = runTests;
+})(typeof window !== 'undefined' ? window : this);
+
+/* =====================================================================
+   POIDS DE PANIQUE ! — Interface et déroulement (contrôleur)
+   L'interface demande, le moteur (Engine) décide.
+   ===================================================================== */
+(function () {
+  'use strict';
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const CN = { R: 'rouge', B: 'bleue', G: 'verte', J: 'arc-en-ciel' };
+  const CNs = { R: 'Rouge', B: 'Bleue', G: 'Verte', J: 'Joker' };
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const av = (id, mood, cls) => `<span class="av ${mood ? 'm-' + mood : ''} ${cls || ''}">${Avatars.avatarSVG(id, mood)}</span>`;
+
+  /* ---------- Paramètres sauvegardés ---------- */
+  const DEFAULTS = { name: '', avatar: 0, n: 6, cycles: 2, passLimit: 1, level: 'normal', delay: 0, reduced: false, speed: 'normal' };
+  let cfg = Object.assign({}, DEFAULTS);
+  try { Object.assign(cfg, JSON.parse(localStorage.getItem('pdp-cfg') || '{}')); } catch (e) { /* stockage indisponible */ }
+  if (cfg.passLimit === null || cfg.passLimit === 'inf') cfg.passLimit = Infinity;
+  const save = () => { try { localStorage.setItem('pdp-cfg', JSON.stringify(Object.assign({}, cfg, { passLimit: cfg.passLimit === Infinity ? 'inf' : cfg.passLimit }))); } catch (e) { } };
+  const speedF = () => ({ slow: 1.7, normal: 1, fast: 0.45 })[cfg.speed] * (cfg.reduced ? 0.6 : 1);
+
+  /* ---------- État du contrôleur ---------- */
+  const G = { s: null, me: 0, gen: 0, sel: { card: null, puck: null }, moods: {}, chat: [], unread: 0, muted: new Set(),
+    timer: null, timerEnd: 0, timerTotal: 0, chatTo: 'all', lastSend: 0, busy: false, lastCfg: null };
+
+  function later(fn, ms) { const g = G.gen; setTimeout(() => { if (g === G.gen) fn(); }, ms); }
+
+  /* =================== NAVIGATION =================== */
+  function go(id) { $$('.screen').forEach(s => s.classList.toggle('active', s.id === 'scr-' + id)); if (id === 'setup') renderSetup(); }
+  document.addEventListener('click', e => {
+    const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go);
+    const m = e.target.closest('[data-modal]'); if (m) openModal(m.dataset.modal);
+  });
+
+  /* =================== ACCUEIL / CONFIGURATION =================== */
+  $('#home-avs').innerHTML = [0, 2, 5, 8, 11].map((i, k) => av(i, ['happy', 'surprise', 'party', 'think', 'happy'][k])).join('');
+  document.body.classList.toggle('reduced', !!cfg.reduced);
+
+  const SEGS = {
+    cycles: [[1, '1'], [2, '2'], [3, '3'], [5, '5'], [10, '10']],
+    passLimit: [[0, '0'], [1, '1'], [2, '2'], [3, '3'], [Infinity, '∞']],
+    level: [['easy', 'Facile'], ['normal', 'Normal'], ['expert', 'Expert'], ['mixed', 'Mélangé']],
+    delay: [[0, 'Aucun'], [20, '20 s'], [45, '45 s'], [90, '90 s']]
+  };
+  function renderSetup() {
+    $('#cfg-name').value = cfg.name || '';
+    $('#cfg-avs').innerHTML = Avatars.AVATARS.map((a, i) => `<button data-av="${i}" class="${cfg.avatar === i ? 'on' : ''}">${av(i, cfg.avatar === i ? 'happy' : '')}<br>${esc(a.name)}</button>`).join('');
+    $('#cfg-n').textContent = cfg.n;
+    $('#cfg-n-hint').textContent = `toi + ${cfg.n - 1} IA`;
+    Object.keys(SEGS).forEach(k => {
+      const el = $(`.seg[data-k="${k}"]`);
+      el.innerHTML = SEGS[k].map(([v, l], i) => `<button data-i="${i}" class="${cfg[k] === v ? 'on' : ''}">${l}</button>`).join('');
+    });
+  }
+  $('#cfg-avs').addEventListener('click', e => { const b = e.target.closest('[data-av]'); if (!b) return; cfg.avatar = +b.dataset.av; save(); renderSetup(); });
+  $$('.seg').forEach(el => el.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cfg[el.dataset.k] = SEGS[el.dataset.k][+b.dataset.i][0]; save(); renderSetup(); }));
+  $('#np-minus').onclick = () => { cfg.n = Math.max(2, cfg.n - 1); save(); renderSetup(); };
+  $('#np-plus').onclick = () => { cfg.n = Math.min(12, cfg.n + 1); save(); renderSetup(); };
+  $('#cfg-name').addEventListener('input', e => { cfg.name = e.target.value.slice(0, 14); save(); });
+  $('#btn-start').onclick = () => startGame();
+
+  /* =================== CRÉATION DE PARTIE =================== */
+  function startGame(again) {
+    const name = (cfg.name || '').trim() || 'Moi';
+    const others = Avatars.AVATARS.map((_, i) => i).filter(i => i !== cfg.avatar).sort(() => Math.random() - 0.5);
+    const players = [{ name, avatar: cfg.avatar, isAI: false }];
+    for (let i = 1; i < cfg.n; i++) {
+      const a = others[i - 1];
+      const level = cfg.level === 'mixed' ? pick(['easy', 'normal', 'normal', 'expert']) : cfg.level;
+      players.push({ name: Avatars.AVATARS[a].name, avatar: a, isAI: true, level, persona: AI.makePersona(Math.floor(Math.random() * 100)) });
+    }
+    G.gen++;
+    G.s = Engine.createGame({ players, cycles: cfg.cycles, passLimit: cfg.passLimit });
+    G.chat = []; G.unread = 0; G.moods = {}; G.muted.clear(); G.chatTo = 'all';
+    go('game');
+    sys(`Partie lancée : ${players.length} joueurs, ${cfg.cycles} cycle(s), passes par joueur pour toute la partie : ${cfg.passLimit === Infinity ? 'illimitées' : cfg.passLimit}.`);
+    renderChatTo();
+    startBetPhase();
+  }
+
+  /* =================== PHASE 1 : MISES SECRÈTES =================== */
+  function startBetPhase() {
+    const s = G.s;
+    G.sel = { card: null, puck: null };
+    renderAll();
+    // les IA misent en secret (elles ne reçoivent que la vue publique)
+    s.players.filter(p => p.isAI).forEach(p => {
+      later(() => {
+        if (s.phase !== 'bet' || Engine.hasBet(s, p.id)) return;
+        const b = AI.chooseBet(Engine.publicView(s, p.id), p);
+        const r = Engine.submitBet(s, p.id, b.card, b.puck);
+        if (!r.ok) console.warn('IA', p.name, r.error);
+        renderHud(); renderPlayers(); renderPanel(); checkAllIn();
+      }, rand(500, 2200) * speedF());
+    });
+    // un peu de bavardage
+    const talkers = s.players.filter(p => p.isAI && Math.random() < p.persona.chat * 0.6).slice(0, 2);
+    talkers.forEach(p => later(() => aiSay(p, 'roundStart'), rand(300, 1800) * speedF()));
+    const hot = AI.hottest(Engine.publicView(s, 0));
+    if (hot) { const p = pick(s.players.filter(x => x.isAI)); later(() => aiSay(p, 'danger', { c: hot }), rand(900, 2500) * speedF()); }
+    startTimer(() => { // temps écoulé : une IA joue temporairement à ta place
+      if (s.phase !== 'bet' || Engine.hasBet(s, G.me)) return;
+      const me = s.players[G.me];
+      const b = AI.chooseBet(Engine.publicView(s, G.me), { level: 'normal', persona: AI.makePersona(1) });
+      Engine.submitBet(s, G.me, b.card, b.puck);
+      toast('⏰ Temps écoulé : une IA a misé à ta place.');
+      renderAll(); checkAllIn();
+    });
+  }
+  function validateBet() {
+    const s = G.s;
+    if (G.busy) return;
+    const r = Engine.submitBet(s, G.me, G.sel.card, G.sel.puck);
+    if (!r.ok) { toast(r.error); return; }
+    stopTimer();
+    setMood(G.me, 'think', 1500);
+    renderAll(); checkAllIn();
+  }
+  function checkAllIn() {
+    const s = G.s;
+    if (s.phase === 'bet' && Engine.allBetsIn(s) && !G.busy) { G.busy = true; later(doReveal, 450 * speedF()); }
+  }
+
+  /* =================== PHASE 2 : RÉVÉLATION =================== */
+  function doReveal() {
+    const s = G.s;
+    const r = Engine.reveal(s);
+    G.busy = false;
+    if (!r.ok) { toast(r.error); return; }
+    s.players.forEach(p => setMood(p.id, 'surprise', 1200));
+    const order = r.order;
+    const tiles = order.map((pid, i) => {
+      const p = s.players[pid], b = r.revealed[pid];
+      return `<div class="rv" data-i="${i}"><div class="back">?</div><div class="front"><span class="rk">${i + 1}.</span>${av(p.avatar, 'surprise')}<div class="num">${b.card}</div><div><span class="pk ${b.puck}"></span> ${CNs[b.puck]}</div><div style="max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.id === G.me ? 'Toi' : p.name)}</div></div></div>`;
+    }).join('');
+    openModalRaw('🃏 Mises révélées !', `<p style="margin:0 0 8px;font-weight:700">Ordre de placement : de la plus forte carte à la plus faible (égalités : premier joueur tournant).</p><div class="reveal-grid">${tiles}</div>`,
+      [['▶ Placement !', 'primary', closeReveal]]);
+    order.forEach((_, i) => later(() => { const t = document.querySelector(`.rv[data-i="${i}"]`); if (t) t.classList.add('flip'); }, (150 + i * 140) * speedF()));
+    sys('Mises révélées. Ordre : ' + order.map(pid => `${s.players[pid].name} (${r.revealed[pid].card})`).join(' → '));
+    // une IA mal placée réclame une passe
+    if (s.passLimit > 0) {
+      const late = order.slice(Math.ceil(order.length / 2)).map(id => s.players[id]).filter(p => p.isAI);
+      if (late.length && AI.hottest(Engine.publicView(s, 0))) later(() => aiSay(pick(late), 'wantPass'), 900 * speedF());
+    }
+    G.revealAuto = later(closeReveal, (2600 + order.length * 140) * speedF());
+  }
+  function closeReveal() {
+    if (G.s.phase !== 'place' || !$('#modal').classList.contains('on') || !$('.reveal-grid')) return;
+    closeModal(); renderAll(); later(nextTurn, 250);
+  }
+
+  /* =================== PHASE 3 : PLACEMENT ET PASSES =================== */
+  function nextTurn() {
+    const s = G.s;
+    if (s.phase !== 'place' || G.busy) return;
+    renderAll();
+    const pid = s.queue[0];
+    const p = s.players[pid];
+    if (p.isAI) {
+      later(() => {
+        if (s.phase !== 'place' || s.queue[0] !== pid) return;
+        const d = AI.choosePlacement(Engine.publicView(s, pid), p);
+        if (d.action === 'pass') doPass(pid); else doPlace(pid, d.color);
+      }, rand(700, 1300) * speedF());
+    } else {
+      if (navigator.vibrate) try { navigator.vibrate(40); } catch (e) { }
+      startTimer(() => {
+        if (s.phase !== 'place' || s.queue[0] !== G.me) return;
+        const d = AI.choosePlacement(Engine.publicView(s, G.me), { level: 'normal', persona: AI.makePersona(1) });
+        toast('⏰ Temps écoulé : une IA joue à ta place.');
+        if (d.action === 'pass') doPass(G.me); else doPlace(G.me, d.color);
+      });
+    }
+  }
+  function doPass(pid) {
+    const s = G.s;
+    if (G.busy) return;
+    const r = Engine.pass(s, pid);
+    if (!r.ok) { toast(r.error); return; }
+    stopTimer();
+    const p = s.players[pid];
+    setMood(pid, 'think', 1600);
+    const left = p.passesLeft === Infinity ? '∞' : p.passesLeft;
+    bubble(p.avatar, `${esc(pid === G.me ? 'Tu passes' : p.name + ' passe')} ⏭ (reste ${left})`, true);
+    sys(`⏭ ${p.name} passe et retourne en fin de file (passes restantes pour la partie : ${left}).`);
+    if (p.isAI && Math.random() < 0.55) later(() => aiSay(p, 'passed'), 300);
+    renderAll();
+    later(nextTurn, 600 * speedF());
+  }
+  function doPlace(pid, color) {
+    const s = G.s;
+    if (G.busy) return;
+    const bet = s.revealed[pid];
+    const scBefore = s.scales[bet.puck === 'J' ? color : bet.puck].cubes.slice();
+    const r = Engine.place(s, pid, color);
+    if (!r.ok) { toast(r.error); return; }
+    stopTimer();
+    G.busy = true;
+    const res = r.result, p = s.players[pid];
+    renderPlayers(); renderQueue(); renderPanel();
+    if (!res.overflow) {
+      renderScales(res.color);
+      setMood(pid, res.massAfter >= 12 ? 'surprise' : 'happy', 1400);
+      bubble(p.avatar, `${esc(pid === G.me ? 'Tu poses' : p.name + ' pose')} <b>${res.card}</b> sur la ${CN[res.color]} → ${res.massAfter}/14`);
+      if (p.isAI && res.massAfter >= 12 && Math.random() < 0.4) later(() => aiSay(p, 'safe'), 400);
+      later(() => afterPlace(res), 700 * speedF());
+    } else {
+      // le cube tombe, la balance bascule, les cubes s'éparpillent
+      renderScaleCubes(res.color, scBefore.concat([{ v: res.card, owner: pid }]), true);
+      later(() => tipScale(res, scBefore), 450 * speedF());
+    }
+  }
+  function tipScale(res, scBefore) {
+    const s = G.s, p = s.players[res.pid];
+    const el = document.querySelector(`.scale[data-c="${res.color}"]`);
+    el.classList.add('tipping');
+    scatter(el);
+    later(() => {
+      el.classList.remove('tipping');
+      renderScales();
+      const fx = $('#fx');
+      const pop = document.createElement('div');
+      pop.className = 'penpop';
+      pop.innerHTML = `${av(p.avatar, 'sad')}<span>${esc(res.pid === G.me ? 'Toi' : p.name)}<br><b>+${res.penalty} pt${res.penalty > 1 ? 's' : ''}</b></span>`;
+      fx.appendChild(pop); setTimeout(() => pop.remove(), 2000);
+      setMood(res.pid, 'sad', 2200);
+      s.players.forEach(o => { if (o.id !== res.pid && Math.random() < 0.6) setMood(o.id, 'party', 1600); });
+      sys(`💥 La balance ${CN[res.color]} bascule (${res.massAfter}/14) ! ${p.name} prend ${res.penalty} point(s) de pénalité (${res.cubesBefore} cube(s) avant le sien). La balance est vidée.`);
+      const lastOwner = scBefore.length ? s.players[scBefore[scBefore.length - 1].owner] : null;
+      if (p.isAI && Math.random() < 0.75) later(() => aiSay(p, 'gotHit', { n: lastOwner && lastOwner.id !== p.id ? lastOwner.name : 'tout le monde' }), 500);
+      const mocker = s.players.filter(o => o.isAI && o.id !== res.pid);
+      if (mocker.length && Math.random() < 0.55) later(() => aiSay(pick(mocker), 'otherHit', { n: p.id === G.me ? s.players[G.me].name : p.name, pen: res.penalty }), 1100);
+      later(() => afterPlace(res), 1500 * speedF());
+    }, 750 * speedF());
+  }
+  function scatter(el) {
+    if (cfg.reduced) return;
+    const fx = $('#fx'), box = $('#scene').getBoundingClientRect();
+    el.querySelectorAll('.cube').forEach(c => {
+      const r = c.getBoundingClientRect();
+      const f = c.cloneNode(true);
+      f.classList.add('fly'); f.classList.remove('drop');
+      f.style.left = (r.left - box.left) + 'px'; f.style.top = (r.top - box.top) + 'px';
+      fx.appendChild(f);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        f.style.transform = `translate(${rand(-140, 140)}px, ${rand(30, 170)}px) rotate(${rand(-400, 400)}deg)`;
+        f.style.opacity = '0';
+      }));
+      setTimeout(() => f.remove(), 1300);
+      c.style.visibility = 'hidden';
+    });
+  }
+  function afterPlace(res) {
+    G.busy = false;
+    renderAll();
+    const info = res.roundEnd;
+    if (!info) { nextTurn(); return; }
+    if (info.gameOver) { later(showResults, 900 * speedF()); return; }
+    if (info.newCycle) {
+      const s = G.s;
+      sys(`🔄 Cycle ${s.cycle}/${s.cycles} : chacun récupère ses cartes 0 à 6 et ses 8 palets. Les balances restent chargées !`);
+      openModalRaw('🔄 Nouveau cycle !', `<p><b>Cycle ${s.cycle}/${s.cycles}</b></p><p>Tout le monde récupère <b>ses 7 cartes</b> et <b>ses 8 palets</b> en même temps.</p><p>⚠️ Les balances <b>ne sont pas vidées</b> : leurs cubes restent en place.</p>`, [['C’est reparti !', 'primary', () => { closeModal(); startBetPhase(); }]]);
+      const p = pick(s.players.filter(x => x.isAI)); if (p) later(() => aiSay(p, 'newCycle'), 700);
+    } else {
+      bubble(null, `Manche ${G.s.round}/7 : à vos mises !`, true);
+      later(startBetPhase, 500 * speedF());
+    }
+  }
+
+  /* =================== RÉSULTATS =================== */
+  function showResults() {
+    const s = G.s;
+    stopTimer();
+    const rk = Engine.ranking(s);
+    const win = Engine.winners(s);
+    const meWin = win.includes(G.me);
+    const P = id => s.players[id];
+    let pos = 0, prev = -1; const posOf = {};
+    const rows = rk.map((r, i) => { if (r.penalty !== prev) { pos = i + 1; prev = r.penalty; } posOf[r.id] = pos; const p = P(r.id);
+      return `<div class="rank-row"><span class="pos">${pos === 1 ? '👑' : pos}</span>${av(p.avatar, pos === 1 ? 'party' : (i === rk.length - 1 ? 'sad' : ''))}<span class="n">${esc(p.id === G.me ? p.name + ' (toi)' : p.name)}<br><small>${p.overflows} bascule(s) provoquée(s)</small></span><span class="p">${r.penalty}</span></div>`; }).join('');
+    const top = rk.slice(0, 3);
+    const order = top.length === 3 ? [top[1], top[0], top[2]] : top;
+    const heights = { 0: 70, 1: 50, 2: 36 };
+    const podium = order.map(r => { const k = rk.indexOf(r), ps = posOf[r.id]; return `<div class="pd">${av(P(r.id).avatar, ps === 1 ? 'party' : 'happy')}<span style="font-size:12px">${esc(P(r.id).name)}</span><div class="blk" style="height:${heights[Math.min(ps - 1, 2)]}px">${ps}</div></div>`; }).join('');
+    $('#scr-results').innerHTML = `<h2>${meWin ? (win.length > 1 ? '🤝 Victoire ex æquo !' : '🏆 Tu as gagné !') : (win.length > 1 ? '🤝 Ex æquo !' : '🏁 Fin de partie')}</h2>
+      <div style="font-weight:800;text-align:center">${win.length > 1 ? 'Gagnants ex æquo : ' : 'Gagnant : '}${win.map(id => esc(P(id).name)).join(', ')} — ${P(win[0]).penalty} point(s) de pénalité</div>
+      <div class="podium">${podium}</div><div class="res-list">${rows}</div>
+      <div class="res-btns"><button class="btn" data-go="home">🏠 Accueil</button><button class="btn primary" id="btn-again">🔁 Rejouer</button></div>`;
+    go('results');
+    $('#btn-again').onclick = () => startGame(true);
+    if (!cfg.reduced) for (let i = 0; i < 40; i++) {
+      const c = document.createElement('div'); c.className = 'confetti';
+      c.style.left = rand(0, 100) + '%'; c.style.background = pick(['#e74c3c', '#3d8bfd', '#27ae60', '#f9ca24', '#a55eea']);
+      c.style.animationDuration = rand(2, 4) + 's'; c.style.animationDelay = rand(0, 1.5) + 's';
+      $('#scr-results').appendChild(c); setTimeout(() => c.remove(), 6000);
+    }
+  }
+
+  /* =================== RENDU =================== */
+  function renderAll() { renderHud(); renderScales(); renderQueue(); renderPlayers(); renderPanel(); }
+  function renderHud() {
+    const s = G.s;
+    $('#hud-title').textContent = `Cycle ${s.cycle}/${s.cycles} · Manche ${s.round}/7`;
+    let sub = '';
+    if (s.phase === 'bet') sub = `🤫 Mises secrètes — ${s.players.filter(p => Engine.hasBet(s, p.id)).length}/${s.players.length} validées`;
+    else if (s.phase === 'place') { const p = s.players[s.queue[0]]; sub = `⚖️ Placement — au tour de ${p.id === G.me ? 'toi !' : p.name}`; }
+    else sub = 'Partie terminée';
+    $('#hud-sub').textContent = sub;
+  }
+  function scaleHTML(c) {
+    return `<div class="scale" data-c="${c}"><div class="sc-info"><span class="mass">0</span>/14<span class="cnt">0 cube</span></div>
+      <div class="pan-wrap"><div class="stack"></div><div class="pan"></div></div><div class="stem"></div>
+      <div class="body"><div class="dial"><div class="needle"></div></div><div class="lbl">${CN[c].toUpperCase()}</div></div></div>`;
+  }
+  function renderScales(dropColor) {
+    if (!$('#scales').children.length) $('#scales').innerHTML = ['R', 'B', 'G'].map(scaleHTML).join('');
+    ['R', 'B', 'G'].forEach(c => renderScaleCubes(c, G.s.scales[c].cubes, c === dropColor));
+    // balance ciblée par le joueur courant
+    $$('.scale').forEach(el => el.classList.remove('target'));
+    const s = G.s;
+    if (s.phase === 'place' && s.revealed) { const b = s.revealed[s.queue[0]]; if (b && b.puck !== 'J') { const t = document.querySelector(`.scale[data-c="${b.puck}"]`); if (t) t.classList.add('target'); } }
+  }
+  function renderScaleCubes(c, cubes, animLast) {
+    const el = document.querySelector(`.scale[data-c="${c}"]`); if (!el) return;
+    const mass = cubes.reduce((a, x) => a + x.v, 0);
+    el.querySelector('.mass').textContent = mass;
+    el.querySelector('.cnt').textContent = `${cubes.length} cube${cubes.length > 1 ? 's' : ''}`;
+    el.querySelector('.stack').innerHTML = cubes.map((x, i) => `<div class="cube ${animLast && i === cubes.length - 1 ? 'drop' : ''}" data-v="${x.v}" title="${esc(G.s.players[x.owner].name)}">${x.v}</div>`).join('');
+    el.querySelector('.needle').style.transform = `rotate(${-90 + Math.min(mass, 16) / 14 * 180}deg)`;
+    el.querySelector('.pan-wrap').style.transform = `rotate(${(mass - 7) * 0.35}deg) translateY(${Math.min(mass, 14) * 0.25}px)`;
+    el.classList.toggle('hot', mass >= 9 && mass < 12);
+    el.classList.toggle('danger', mass >= 12);
+  }
+  function renderQueue() {
+    const s = G.s, q = $('#queue');
+    if (s.phase === 'place' && s.revealed) {
+      const placed = s.lastOrder.filter(id => s.players[id].placed);
+      q.innerHTML = `<span class="ql">File :</span>` + s.queue.map((id, i) => { const b = s.revealed[id];
+        return `<span class="qi ${i === 0 ? 'cur' : ''}">${av(s.players[id].avatar)}${b.card}<span class="pk ${b.puck}"></span></span>`; }).join('')
+        + placed.map(id => `<span class="qi done">${av(s.players[id].avatar)}✔</span>`).join('');
+    } else if (s.phase === 'bet') {
+      q.innerHTML = `<span class="ql">🤫 Chacun choisit une carte et un palet en secret…</span>`;
+    } else q.innerHTML = '';
+  }
+  function renderPlayers() {
+    const s = G.s;
+    $('#players').innerHTML = s.players.map(p => {
+      const turn = s.phase === 'place' && s.queue[0] === p.id;
+      let mk = '', mini = '';
+      if (s.phase === 'bet') mk = Engine.hasBet(s, p.id) ? '✅' : '⏳';
+      if (s.phase === 'place' && s.revealed) { const b = s.revealed[p.id]; mini = `${b.card}<span class="pk ${b.puck}" style="width:9px;height:9px"></span>`; mk = p.placed ? '✔' : ''; }
+      const passes = s.passLimit === Infinity ? '∞' : p.passesLeft;
+      const mood = (G.moods[p.id] && G.moods[p.id].until > Date.now()) ? G.moods[p.id].mood : '';
+      return `<div class="pc ${p.id === G.me ? 'me' : ''} ${turn ? 'turn' : ''} ${G.muted.has(p.id) ? 'muted' : ''}">${mini ? `<span class="mini">${mini}</span>` : ''}<span class="mk">${mk}</span>
+        ${av(p.avatar, mood)}<div class="nm">${esc(p.id === G.me ? 'Toi' : p.name)}</div>
+        <div class="st"><span class="pen" title="Pénalités">⚠${p.penalty}</span><span title="Passes restantes pour la partie">⏭${passes}</span></div></div>`;
+    }).join('');
+    const t = document.querySelector('.pc.turn'); if (t) { const box = $('#players'); if (t.offsetLeft < box.scrollLeft || t.offsetLeft + t.offsetWidth > box.scrollLeft + box.clientWidth) box.scrollLeft = t.offsetLeft - box.clientWidth / 2; }
+  }
+  function timerHTML() { return G.timerTotal ? `<div class="timer"><i id="timer-bar" style="width:${Math.max(0, (G.timerEnd - Date.now()) / G.timerTotal * 100)}%"></i></div>` : ''; }
+  function renderPanel() {
+    const s = G.s, me = s.players[G.me], panel = $('#panel');
+    if (s.phase === 'bet') {
+      if (Engine.hasBet(s, G.me)) {
+        const b = Engine.publicView(s, G.me).myBet;
+        const n = s.players.filter(p => Engine.hasBet(s, p.id)).length;
+        panel.innerHTML = `<div class="wait">${av(me.avatar, 'think')}<div>Mise validée : <span class="mybet">${b.card} <span class="pk ${b.puck}"></span> ${CNs[b.puck]}</span><br>En attente des autres… (${n}/${s.players.length})</div></div>`;
+        return;
+      }
+      const sel = G.sel;
+      panel.innerHTML = timerHTML() + `<div class="pt"><span>Ta carte</span><span style="font-weight:700;font-size:12px">⚠ ${me.penalty} pt · ordre : 6 joue en premier</span></div>
+        <div class="cards">${[0, 1, 2, 3, 4, 5, 6].map(v => `<button class="card ${sel.card === v ? 'on' : ''}" data-card="${v}" ${me.hand.includes(v) ? '' : 'disabled'}>${v}</button>`).join('')}</div>
+        <div class="pt" style="margin-top:7px"><span>Ton palet</span><span style="font-weight:700;font-size:12px">🌈 = choix de la balance au placement</span></div>
+        <div class="pucks">${['R', 'B', 'G', 'J'].map(k => `<button class="puck ${sel.puck === k ? 'on' : ''}" data-puck="${k}" ${me.pucks[k] > 0 ? '' : 'disabled'}><span class="disc pk ${k}"></span>×${me.pucks[k]}</button>`).join('')}</div>
+        <div class="actions"><button class="btn primary" id="btn-validate" ${sel.card !== null && sel.puck ? '' : 'disabled'}>✅ Valider ma mise</button></div>`;
+      return;
+    }
+    if (s.phase === 'place') {
+      const cur = s.queue[0], b = s.revealed[G.me];
+      const myLine = me.placed ? 'Ton cube est posé ✔' : `Ta mise : <span class="mybet">${b.card} <span class="pk ${b.puck}"></span> ${CNs[b.puck]}</span> · place ${s.queue.indexOf(G.me) + 1} dans la file`;
+      if (cur !== G.me) {
+        const p = s.players[cur], pb = s.revealed[cur];
+        panel.innerHTML = `<div class="wait">${av(p.avatar, 'think')}<div>Au tour de <b>${esc(p.name)}</b> (carte ${pb.card}, palet ${CN[pb.puck]})…<br><small>${myLine}</small></div></div>`;
+        return;
+      }
+      const canPass = Engine.canPass(s, G.me);
+      const left = me.passesLeft === Infinity ? '∞' : me.passesLeft;
+      const why = s.queue.length <= 1 ? 'dernier à poser' : (me.passesLeft <= 0 ? 'plus de passe' : '');
+      const preview = c => { const sc = s.scales[c]; const m = Engine.massOf(sc); const nm = m + b.card;
+        return nm > 14 ? { txt: `${m}→${nm} 💥 +${sc.cubes.length} pt`, bad: true } : { txt: `${m}→${nm}/14`, bad: false }; };
+      let place;
+      if (b.puck === 'J') {
+        place = `<div class="pt" style="margin-top:4px">🌈 Choisis ta balance :</div><div class="colbtns">${['R', 'B', 'G'].map(c => { const pv = preview(c);
+          return `<button class="btn c${c} ${pv.bad ? 'warn' : ''}" data-place="${c}">${CNs[c]}<small>${pv.txt}</small></button>`; }).join('')}</div>`;
+      } else {
+        const pv = preview(b.puck);
+        place = `<div class="colbtns" style="grid-template-columns:1fr"><button class="btn c${b.puck} ${pv.bad ? 'warn' : ''}" data-place="${b.puck}">Placer sur la ${CN[b.puck]}<small>${pv.txt}</small></button></div>`;
+      }
+      panel.innerHTML = timerHTML() + `<div class="pt"><span>👉 À toi ! Carte <b>${b.card}</b> · palet ${CNs[b.puck]}</span></div>${place}
+        <div class="actions"><button class="btn" id="btn-pass" ${canPass ? '' : 'disabled'}>⏭ Passer (${left} pour la partie)${why ? ' — ' + why : ''}</button></div>`;
+      return;
+    }
+    panel.innerHTML = '';
+  }
+  $('#panel').addEventListener('click', e => {
+    const s = G.s; if (!s) return;
+    const c = e.target.closest('[data-card]'); if (c && !c.disabled) { G.sel.card = +c.dataset.card; renderPanel(); return; }
+    const k = e.target.closest('[data-puck]'); if (k && !k.disabled) { G.sel.puck = k.dataset.puck; renderPanel(); return; }
+    if (e.target.closest('#btn-validate')) { validateBet(); return; }
+    const pl = e.target.closest('[data-place]'); if (pl && s.queue[0] === G.me) { doPlace(G.me, pl.dataset.place); return; }
+    if (e.target.closest('#btn-pass') && s.queue[0] === G.me) doPass(G.me);
+  });
+
+  function setMood(pid, mood, ms) { G.moods[pid] = { mood, until: Date.now() + ms }; if ($('#scr-game').classList.contains('active')) renderPlayers(); later(() => renderPlayers(), ms + 50); }
+
+  /* ---------- Délai de réflexion ---------- */
+  function startTimer(onExpire) {
+    stopTimer();
+    if (!cfg.delay) return;
+    G.timerTotal = cfg.delay * 1000; G.timerEnd = Date.now() + G.timerTotal;
+    const g = G.gen;
+    G.timer = setInterval(() => {
+      if (g !== G.gen) return stopTimer();
+      const bar = $('#timer-bar'); if (bar) bar.style.width = Math.max(0, (G.timerEnd - Date.now()) / G.timerTotal * 100) + '%';
+      if (Date.now() >= G.timerEnd) { stopTimer(); onExpire(); }
+    }, 250);
+  }
+  function stopTimer() { if (G.timer) clearInterval(G.timer); G.timer = null; G.timerTotal = 0; }
+
+  /* =================== BULLES, TOASTS =================== */
+  function bubble(avatarId, html, sysStyle) {
+    const b = document.createElement('div');
+    b.className = 'bubble' + (sysStyle ? ' sys' : '');
+    b.innerHTML = (avatarId === null ? '<span style="padding-left:6px"></span>' : av(avatarId)) + `<span>${html}</span>`;
+    const box = $('#bubbles'); box.appendChild(b);
+    while (box.children.length > 3) box.firstChild.remove();
+    setTimeout(() => b.remove(), 3200);
+  }
+  let toastT;
+  function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2600); }
+
+  /* =================== CHAT =================== */
+  function addMsg(m) {
+    if (m.from !== undefined && m.from !== null && G.muted.has(m.from)) return;
+    G.chat.push(m);
+    if (G.chat.length > 300) G.chat.shift();
+    if ($('#chat').classList.contains('on')) renderChat(); else if (!m.sys) { G.unread++; renderBadge(); }
+  }
+  function sys(text) { addMsg({ sys: true, text }); }
+  function aiSay(p, kind, ctx) {
+    if (!p || G.muted.has(p.id)) return;
+    const t = AI.say(kind, p.persona, ctx); if (!t) return;
+    addMsg({ from: p.id, text: t });
+    bubble(p.avatar, `<b>${esc(p.name)} :</b> ${esc(t)}`);
+  }
+  function renderBadge() { const b = $('#chat-badge'); b.textContent = G.unread; b.classList.toggle('on', G.unread > 0); }
+  function renderChatTo() {
+    const s = G.s;
+    $('#chat-to').innerHTML = `<option value="all">📢 Tout le monde</option>` + s.players.filter(p => p.id !== G.me).map(p => `<option value="${p.id}">🔒 ${esc(p.name)}</option>`).join('');
+    $('#chat-to').value = G.chatTo;
+    $('#quick').innerHTML = ['Qui passe ?', 'Attention à la rouge !', 'Ne chargez pas la bleue !', 'La verte va sauter…', 'Promis, je joue petit.', 'Bien joué !', 'Alliance ?'].map(q => `<button>${q}</button>`).join('');
+  }
+  function renderChat() {
+    const s = G.s;
+    $('#chat-list').innerHTML = G.chat.map(m => {
+      if (m.sys) return `<div class="msg sys"><div class="bx">${esc(m.text)}</div></div>`;
+      const p = s.players[m.from], mine = m.from === G.me;
+      const priv = m.to !== undefined && m.to !== null && m.to !== 'all';
+      const who = mine ? (priv ? `Toi → ${esc(s.players[m.to].name)} 🔒` : 'Toi') : (esc(p.name) + (priv ? ' 🔒 (privé)' : ''));
+      return `<div class="msg ${mine ? 'mine' : ''} ${priv ? 'priv' : ''}">${av(p.avatar)}<div class="bx"><b>${who}</b>${esc(m.text)}</div></div>`;
+    }).join('');
+    const l = $('#chat-list'); l.scrollTop = l.scrollHeight;
+    $('#mute-list').innerHTML = s.players.filter(p => p.id !== G.me).map(p => `<button data-mute="${p.id}" class="${G.muted.has(p.id) ? 'off' : ''}">${av(p.avatar)}${esc(p.name)}</button>`).join('');
+  }
+  function sendChat(text) {
+    text = (text || '').trim().slice(0, 200);
+    if (!text) return;
+    if (Date.now() - G.lastSend < 700) { toast('Doucement ! 🐢'); return; }   // anti-spam
+    G.lastSend = Date.now();
+    const s = G.s;
+    const to = G.chatTo === 'all' ? 'all' : +G.chatTo;
+    addMsg({ from: G.me, to, text });
+    $('#chat-in').value = '';
+    // réponses des IA (dialogues programmés, sans API)
+    const responders = to === 'all' ? s.players.filter(p => p.isAI && !G.muted.has(p.id) && Math.random() < 0.35).slice(0, 2) : [s.players[to]];
+    responders.forEach((p, i) => later(() => {
+      const t = AI.reply(text, p.persona);
+      addMsg({ from: p.id, to: to === 'all' ? 'all' : G.me, text: t });
+      if (to === 'all') bubble(p.avatar, `<b>${esc(p.name)} :</b> ${esc(t)}`);
+    }, (900 + i * 900) * speedF()));
+  }
+  $('#btn-chat').onclick = () => { $('#chat').classList.add('on'); G.unread = 0; renderBadge(); renderChat(); };
+  $('#chat-close').onclick = () => $('#chat').classList.remove('on');
+  $('#chat-send').onclick = () => sendChat($('#chat-in').value);
+  $('#chat-in').addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(e.target.value); });
+  $('#chat-to').onchange = e => { G.chatTo = e.target.value; };
+  $('#quick').addEventListener('click', e => { const b = e.target.closest('button'); if (b) sendChat(b.textContent); });
+  $('#chat-mutes').onclick = () => { const m = $('#mute-list'); m.style.display = m.style.display === 'none' ? 'flex' : 'none'; renderChat(); };
+  $('#mute-list').addEventListener('click', e => { const b = e.target.closest('[data-mute]'); if (!b) return; const id = +b.dataset.mute;
+    if (G.muted.has(id)) G.muted.delete(id); else G.muted.add(id); toast(G.muted.has(id) ? 'Messages masqués' : 'Messages réaffichés'); renderChat(); renderPlayers(); });
+
+  /* =================== MODALES =================== */
+  function openModalRaw(title, body, buttons) {
+    $('#modal-title').textContent = title;
+    $('#modal-body').innerHTML = body;
+    const foot = $('#modal-foot'); foot.innerHTML = '';
+    (buttons || [['Fermer', '', closeModal]]).forEach(([l, cls, fn]) => { const b = document.createElement('button'); b.className = 'btn ' + cls; b.textContent = l; b.onclick = fn; foot.appendChild(b); });
+    $('#modal').classList.add('on');
+  }
+  function closeModal() { $('#modal').classList.remove('on'); }
+  function openModal(kind) {
+    if (kind === 'rules') openModalRaw('📜 Règles', RULES);
+    if (kind === 'settings') openSettings();
+  }
+  function openSettings() {
+    openModalRaw('⚙️ Paramètres', `
+      <h4>Animations</h4><div class="seg" id="st-red"><button data-v="0" class="${!cfg.reduced ? 'on' : ''}">Complètes</button><button data-v="1" class="${cfg.reduced ? 'on' : ''}">Réduites</button></div>
+      <h4>Vitesse des IA</h4><div class="seg" id="st-spd">${[['slow', 'Lente'], ['normal', 'Normale'], ['fast', 'Rapide']].map(([v, l]) => `<button data-v="${v}" class="${cfg.speed === v ? 'on' : ''}">${l}</button>`).join('')}</div>
+      <h4>Avatars</h4><p class="hint">Avatars provisoires dessinés dans l’esprit de Panique au Village. Les fichiers originaux pourront être branchés dans <code>avatars.js</code> (AVATAR_FILES).</p>
+      <h4>Vérification des règles</h4><button class="btn small" id="st-tests">🧪 Lancer les tests</button><div id="st-res"></div>`);
+    $('#st-red').onclick = e => { const b = e.target.closest('button'); if (!b) return; cfg.reduced = b.dataset.v === '1'; document.body.classList.toggle('reduced', cfg.reduced); save(); openSettings(); };
+    $('#st-spd').onclick = e => { const b = e.target.closest('button'); if (!b) return; cfg.speed = b.dataset.v; save(); openSettings(); };
+    $('#st-tests').onclick = () => {
+      $('#st-res').innerHTML = '<p>Tests en cours (200 parties d’IA simulées)…</p>';
+      setTimeout(() => { const r = runTests(Engine, AI); $('#st-res').innerHTML = `<p><b>${r.filter(x => x.ok).length}/${r.length} tests réussis</b></p>` + r.map(x => `<div class="test-row ${x.ok ? 'ok' : 'ko'}">${esc(x.name)}${x.err ? ' — ' + esc(x.err) : ''}</div>`).join(''); }, 50);
+    };
+  }
+  $('#btn-rank').onclick = () => {
+    const s = G.s;
+    const rows = Engine.ranking(s).map((r, i) => { const p = s.players[r.id];
+      return `<div class="rank-row"><span class="pos">${i + 1}</span>${av(p.avatar)}<span class="n">${esc(p.id === G.me ? p.name + ' (toi)' : p.name)}<br><small>${p.isAI ? 'IA ' + ({ easy: 'facile', normal: 'normale', expert: 'experte' })[p.level] : 'Humain'} · cartes : ${p.hand.join(' ') || '—'} · palets : 🔴${p.pucks.R} 🔵${p.pucks.B} 🟢${p.pucks.G} 🌈${p.pucks.J}</small></span><span class="p">${r.penalty}</span></div>`; }).join('');
+    openModalRaw('🏆 Classement provisoire', `<p class="hint">Moins de pénalités = mieux. Cartes et palets restants sont des informations publiques.</p>${rows}`);
+  };
+  $('#btn-menu').onclick = () => openModalRaw('⏸️ Menu', `<p>Cycle ${G.s.cycle}/${G.s.cycles} · Manche ${G.s.round}/7</p>`, [
+    ['📜 Règles', '', () => openModal('rules')], ['⚙️', '', openSettings],
+    ['🚪 Quitter', 'red', () => openModalRaw('Quitter la partie ?', '<p>La partie en cours sera perdue.</p>', [['Annuler', '', closeModal], ['Quitter', 'red', () => { G.gen++; stopTimer(); G.busy = false; closeModal(); go('home'); }]])]]);
+
+  const RULES = `
+    <h4>🎯 But</h4><p>Pose tes cubes sur les balances <b>rouge</b>, <b>bleue</b> et <b>verte</b> sans les faire dépasser <b>14</b>. Le joueur avec le <b>moins de pénalités</b> à la fin gagne (égalité = ex æquo).</p>
+    <h4>🎒 Ton matériel (par cycle)</h4><ul><li>7 cartes : 0, 1, 2, 3, 4, 5, 6 — chacune jouable une seule fois.</li><li>8 palets : 2 rouges, 2 bleus, 2 verts, 2 arc-en-ciel — chacun une seule fois.</li></ul>
+    <h4>🔁 Une manche</h4><ol><li><b>Mise secrète :</b> tout le monde choisit une carte et un palet, puis valide. Personne ne voit les choix des autres.</li>
+    <li><b>Révélation :</b> tout est dévoilé. Ordre de placement : de la carte 6 à la carte 0 ; égalités départagées par un premier joueur qui tourne à chaque manche.</li>
+    <li><b>Placement :</b> à ton tour, pose ton cube (valeur = ta carte) sur la balance de ton palet. Avec un palet 🌈, tu choisis la balance <b>maintenant</b>. Tu peux aussi <b>passer</b> : tu retournes en fin de file.</li></ol>
+    <h4>⏭ Passes</h4><ul><li>Chaque joueur dispose d’un nombre de passes <b>pour toute la partie</b> (0, 1, 2, 3 ou illimité), fixé avant de commencer. Il n’est jamais rechargé.</li><li>Passer ne consomme ni carte ni palet. Les joueurs qui passent rejouent dans l’ordre de leurs passes.</li><li>Le dernier joueur qui n’a pas posé ne peut jamais passer.</li></ul>
+    <h4>💥 Bascule</h4><p>Si la masse dépasse 14, la balance bascule : tu prends autant de points de pénalité qu’il y avait de <b>cubes</b> dessus <b>avant</b> le tien (les cubes 0 comptent !). Puis cette balance seule est vidée.</p>
+    <p><i>Exemple : 6 + 6 sur la rouge (2 cubes), tu poses 4 → 16 : +2 points.</i></p>
+    <h4>🔄 Cycles</h4><p>Un cycle = 7 manches. Ensuite, tout le monde récupère ses 7 cartes et ses 8 palets en même temps. <b>Les balances restent chargées</b> d’un cycle à l’autre.</p>`;
+
+  window.PDP = { G, startGame };   // accès de débogage
+})();
+</script>
+</body>
+</html>
